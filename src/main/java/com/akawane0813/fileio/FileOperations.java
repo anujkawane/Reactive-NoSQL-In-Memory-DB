@@ -5,32 +5,39 @@ import java.util.*;
 
 public class FileOperations {
 
-    final String FILEPATH_TO_STORE_OBJECT_STATE = "src/main/resources/State.txt";
-    final String FILEPATH_TO_STORE_COMMANDS = "src/main/resources/Command.txt";
+    final String FILEPATH_TO_STORE_OBJECT_STATE = "src/main/resources/dbSnapshot.txt";
+    final String FILEPATH_TO_STORE_COMMANDS = "src/main/resources/commands.txt";
     FileInputStream fileInputStream;
     FileOutputStream fileOutputStream;
     ObjectOutputStream objectOutputStream;
+    ObjectInputStream objectInputStream;
 
-    public boolean writeObjectToFile(Object serObj) {
+    public boolean writeObjectToFile(String fileName, Object serObj) {
         try {
-            fileOutputStream = new FileOutputStream(FILEPATH_TO_STORE_OBJECT_STATE);
+            fileOutputStream = new FileOutputStream(fileName);
             objectOutputStream = new ObjectOutputStream(fileOutputStream);
             objectOutputStream.writeObject(serObj);
             objectOutputStream.close();
+            if (fileOutputStream != null) {
+                fileOutputStream.close();
+            }
             return true;
         } catch (Exception ex) {
             return false;
         }
     }
 
-    public Object readObjectFromFile(){
+    public Object readObjectFromFile(String fileName){
         try {
 
-            fileInputStream = new FileInputStream(FILEPATH_TO_STORE_OBJECT_STATE);
-            ObjectInputStream objectOut = new ObjectInputStream(fileInputStream);
+            fileInputStream = new FileInputStream(fileName);
+            objectInputStream = new ObjectInputStream(fileInputStream);
 
-            Object object = objectOut.readObject();
-            objectOut.close();
+            Object object = objectInputStream.readObject();
+            objectInputStream.close();
+            if (fileInputStream != null) {
+                fileInputStream.close();
+            }
             return object;
 
         } catch (Exception ex) {
@@ -72,6 +79,25 @@ public class FileOperations {
             return true;
         } catch (Exception ex){
             return false;
+        }
+    }
+
+    public static void clearFile(String file) {
+        FileWriter fileWriter = null;
+        try {
+            fileWriter = new FileWriter(file, false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        PrintWriter printWriter = new PrintWriter(fileWriter, false);
+        printWriter.flush();
+        printWriter.close();
+
+        try {
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

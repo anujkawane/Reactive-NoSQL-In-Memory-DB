@@ -92,7 +92,7 @@ public class Array implements Serializable{
             if (v instanceof ArrayList) {
                 Array a = this.fromString(v.toString());
                 newArray.put(a);
-            }else if (v instanceof Map) {
+            }else if (v instanceof Object) {
                 Object db = new Object();
                 Object a = db.fromString(v.toString());
                 newArray.put(a);
