@@ -4,6 +4,7 @@ import com.akawane0813.exception.IncompatibleTypeException;
 import com.akawane0813.exception.KeyNotFoundException;
 import com.akawane0813.fileio.FileOperations;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class DatabaseImpl implements Serializable, Database {
         }
     }
 
-    private void checkAndSaveState() {
+    private void backup() {
         counterForBackUp++;
         if(counterForBackUp == intervalForBackup) {
 
@@ -57,7 +58,7 @@ public class DatabaseImpl implements Serializable, Database {
 
     public DatabaseImpl put(String key, java.lang.Object value){
         database.put(key, value);
-        checkAndSaveState();
+        backup();
         return this;
     }
 
@@ -117,14 +118,26 @@ public class DatabaseImpl implements Serializable, Database {
             throw new KeyNotFoundException("No such key as " + key);
         }
         java.lang.Object removed =  database.remove(key);
-        checkAndSaveState();
+        backup();
         return removed;
     }
 
-//    public boolean save(){
-//
-//
-//    }
+
+    public void snapshot(){
+
+    }
+
+    public void snapshot(File commands, File dbSnapshot){
+
+    }
+
+    public void recover(){
+
+    }
+
+    public void recover(File commands, File dbSnapshot){
+
+    }
 
     public void restore(DatabaseImpl databaseMemento){
         if(databaseMemento != null) {
