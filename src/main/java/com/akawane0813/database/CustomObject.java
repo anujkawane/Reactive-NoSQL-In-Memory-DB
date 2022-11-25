@@ -12,24 +12,46 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class CustomObject implements Serializable {
+public class CustomObject implements Serializable, ICustomObject {
 
     Map map;
     transient Gson gson;
+    private String parent;
+
     public CustomObject(){
         map = new HashMap();
         gson = new Gson();
     }
 
-    public boolean put(String key, java.lang.Object object){
-       map.putIfAbsent(key, object);
+    public boolean put(String key, Object object) throws KeyNotFoundException {
+
+        if (map.containsKey(key)) {
+            throw new KeyNotFoundException("Key already present");
+        }
+
+        if (object instanceof Array) {
+            ((Array)object).setParentForNestedValue(getParent()+"."+key);
+        } else if (object instanceof CustomObject) {
+            ((CustomObject)object).setParentForNestedValue(getParent()+"."+key);
+        }
+
+        map.put(key,object);
         return true;
+    }
+
+
+    public Object remove(String key) throws KeyNotFoundException {
+        if(map.containsKey(key)){
+            return map.remove(key);
+        }
+        throw new KeyNotFoundException("No data present in given key "+key);
     }
 
     public String getString(String key) throws IncompatibleTypeException {
         if(map.get(key) instanceof String){
             return (String) map.get(key);
         }
+
         throw new IncompatibleTypeException("CustomObject at "+key+" is not of type String");
     }
 
@@ -54,6 +76,21 @@ public class CustomObject implements Serializable {
         throw new IncompatibleTypeException("CustomObject at key "+key+" is not of type Array");
     }
 
+    public void setParentForNestedValue(String parent) {
+        setParent(parent);
+        this.map.forEach((k,v)->{
+            if(v instanceof Array) {
+                ((Array)v).setParentForNestedValue(parent + "."+ k);
+            } else if(v instanceof CustomObject) {
+                ((CustomObject) v).setParentForNestedValue(parent + "." + k);
+            }
+        });
+    }
+
+    public String getParent() {
+        return parent;
+    }
+
     public java.lang.Object get(String key) throws KeyNotFoundException {
         if(!map.containsKey(key)){
             throw new KeyNotFoundException("No data present in given key "+key);
@@ -65,36 +102,71 @@ public class CustomObject implements Serializable {
         return map.size();
     }
 
-    public CustomObject fromString(String value) {
-        Gson gson = new Gson();
-        Type userListType = new TypeToken<HashMap<String, java.lang.Object>>(){}.getType();
-        HashMap object = (HashMap)gson.fromJson(value, userListType);
-        CustomObject newDBCustomObject = new CustomObject();
-        this.map = object;
-        object.forEach((k, v)
-                -> {
-            System.out.println(k);
-            System.out.println(v instanceof Map);
-            if (v instanceof ArrayList) {
-                Array ab = new Array();
-                Array a = ab.fromString(v.toString());
-                newDBCustomObject.put(k.toString(),a);
-                System.out.println(a);
-            }else if (v instanceof Map) {
-                CustomObject a = fromString(v.toString());
-                newDBCustomObject.put(k.toString(),a);
-                System.out.println(a);
-            } else {
-                newDBCustomObject.put(k.toString(),v);
-            }
-        });
-        return newDBCustomObject;
+    public void setParent(String parent) {
+        this.parent = parent;
     }
 
-    @Override
-    public String toString() {
-        return  (String) map.keySet().stream()
-                .map(key -> key + "=" + map.get(key))
-                .collect(Collectors.joining(", ", "{", "}"));
+    public HashMap<String,Object> convertToHashMap(CustomObject object) {
+        HashMap<String,Object> map = new HashMap<>();
+
+        object.map.forEach((k,v) -> {
+            if (v instanceof Array) {
+                Array arr = new Array();
+                ArrayList a = arr.convertToArrayList((Array)v);
+                map.put((String) k,a);
+            }else if (v instanceof CustomObject) {
+                HashMap a = convertToHashMap((CustomObject) v);
+                map.put((String) k,a);
+            } else {
+                map.put((String) k,v);
+            }
+        });
+        return map;
     }
+
+    public String toString(){
+        HashMap map = convertToHashMap(this);
+        if(gson == null) gson = new Gson();
+        return gson.toJson(map);
+    }
+
+    public CustomObject fromString(String value) {
+        Type userListType = new TypeToken<HashMap<String,Object>>(){}.getType();
+        HashMap object = gson.fromJson(value, userListType);
+        CustomObject newCustomObject = new CustomObject();
+        this.map = object;
+
+        object.forEach((k, v)
+                -> {
+            if (v instanceof ArrayList) {
+                Array array = new Array().fromString(v.toString());
+                try {
+                    newCustomObject.put(k.toString(),array);
+                } catch (KeyNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }else if (v instanceof Map) {
+                CustomObject customObject = fromString(v.toString());
+                try {
+                    newCustomObject.put(k.toString(),customObject);
+                } catch (KeyNotFoundException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    newCustomObject.put(k.toString(),v);
+                } catch (KeyNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        return newCustomObject;
+    }
+
+//    @Override
+//    public String toString() {
+//        return  (String) map.keySet().stream()
+//                .map(key -> key + "=" + map.get(key))
+//                .collect(Collectors.joining(", ", "{", "}"));
+//    }
 }

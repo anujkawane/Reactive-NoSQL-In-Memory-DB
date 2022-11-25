@@ -1,10 +1,5 @@
 package com.akawane0813.memento;
 
-import com.akawane0813.database.DatabaseImpl;
-import com.akawane0813.fileio.FileOperations;
-
-import java.io.File;
-
 public class MementoCaretaker {
     private final String DATABASE_MEMENTO_FILEPATH = "src/main/resources/dbSnapshot.txt";
     private final String COMMANDS_FILEPATH = "src/main/resources/commands.txt";
@@ -28,8 +23,8 @@ public class MementoCaretaker {
 //
 //    public void recover(){
 //        FileOperations fileOperation = new FileOperations();
-//        DatabaseImpl restoredDB =
-//                (DatabaseImpl) fileOperation.readObjectFromFile(new File(DATABASE_MEMENTO_FILEPATH));
+//        Database restoredDB =
+//                (Database) fileOperation.readObjectFromFile(new File(DATABASE_MEMENTO_FILEPATH));
 //        if(restoredDB != null) {
 //            database = restoredDB.database;
 //        }
@@ -41,8 +36,8 @@ public class MementoCaretaker {
 //    }
 //    public void recover(File commands, File dbSnapshot){
 //        FileOperations fileOperation = new FileOperations();
-//        DatabaseImpl restoredDB =
-//                (DatabaseImpl) fileOperation.readObjectFromFile(dbSnapshot);
+//        Database restoredDB =
+//                (Database) fileOperation.readObjectFromFile(dbSnapshot);
 //        if(restoredDB != null) {
 //            database = restoredDB.database;
 //        }
