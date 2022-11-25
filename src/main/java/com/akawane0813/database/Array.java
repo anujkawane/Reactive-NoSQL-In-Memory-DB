@@ -8,8 +8,6 @@ import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class Array implements Serializable{
 
@@ -33,7 +31,7 @@ public class Array implements Serializable{
         if(objectList.get(index) instanceof String){
             return (String) objectList.get(index);
         }
-        throw new IncompatibleTypeException("Object at index "+index+" is not of type String");
+        throw new IncompatibleTypeException("CustomObject at index "+index+" is not of type String");
     }
 
     public int getInt(int index) throws IncompatibleTypeException {
@@ -43,17 +41,17 @@ public class Array implements Serializable{
         if(objectList.get(index) instanceof Integer){
             return (int) objectList.get(index);
         }
-        throw new IncompatibleTypeException("Object at index "+index+" is not of type Integer");
+        throw new IncompatibleTypeException("CustomObject at index "+index+" is not of type Integer");
     }
 
-    public Object getObject(int index) throws IncompatibleTypeException {
+    public CustomObject getObject(int index) throws IncompatibleTypeException {
         if(index > objectList.size()){
             throw new IndexOutOfBoundsException();
         }
-        if(objectList.get(index) instanceof Object){
-            return (Object) objectList.get(index);
+        if(objectList.get(index) instanceof CustomObject){
+            return (CustomObject) objectList.get(index);
         }
-        throw new IncompatibleTypeException("Object at index "+index+" is not of type Object");
+        throw new IncompatibleTypeException("CustomObject at index "+index+" is not of type CustomObject");
     }
 
     public Array getArray(int index) throws Exception {
@@ -63,7 +61,7 @@ public class Array implements Serializable{
         if(objectList.get(index) instanceof Array){
             return (Array) objectList.get(index);
         }
-        throw new IncompatibleTypeException("Object at index "+index+" is not of type Array");
+        throw new IncompatibleTypeException("CustomObject at index "+index+" is not of type Array");
     }
 
     public java.lang.Object get(int index){
@@ -93,9 +91,9 @@ public class Array implements Serializable{
             if (v instanceof ArrayList) {
                 Array a = this.fromString(v.toString());
                 newArray.put(a);
-            }else if (v instanceof Object) {
-                Object db = new Object();
-                Object a = db.fromString(v.toString());
+            }else if (v instanceof CustomObject) {
+                CustomObject db = new CustomObject();
+                CustomObject a = db.fromString(v.toString());
                 newArray.put(a);
             } else {
                 newArray.put(v);

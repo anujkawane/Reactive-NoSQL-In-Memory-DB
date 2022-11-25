@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class DatabaseImpl implements Serializable, Database {
 
-    private Map<String, java.lang.Object> database;
+    private Map<String, Object> database;
     private final String DATABASE_MEMENTO_FILEPATH = "src/main/resources/dbSnapshot.txt";
     private final String COMMANDS_FILEPATH = "src/main/resources/commands.txt";
     private int counterForBackUp = 0;
@@ -45,7 +45,7 @@ public class DatabaseImpl implements Serializable, Database {
         }
     }
 
-    public DatabaseImpl put(String key, java.lang.Object value){
+    public DatabaseImpl put(String key, Object value){
         database.put(key, value);
         backup();
         return this;
@@ -59,7 +59,7 @@ public class DatabaseImpl implements Serializable, Database {
         if(database.get(key) instanceof String){
            return (String) database.get(key);
         }
-        throw new IncompatibleTypeException("Object at key "+key+" is not of type String");
+        throw new IncompatibleTypeException("CustomObject at key "+key+" is not of type String");
     }
 
     public int getInt(String key) throws Exception {
@@ -70,7 +70,7 @@ public class DatabaseImpl implements Serializable, Database {
         if(database.get(key) instanceof Integer){
             return (int) database.get(key);
         }
-        throw new IncompatibleTypeException("Object at key "+key+" is not of type Integer");
+        throw new IncompatibleTypeException("CustomObject at key "+key+" is not of type Integer");
     }
 
     public Array getArray(String key) throws Exception {
@@ -81,21 +81,21 @@ public class DatabaseImpl implements Serializable, Database {
         if(database.get(key) instanceof Array){
             return (Array) database.get(key);
         }
-        throw new IncompatibleTypeException("Object at key "+key+" is not of type Array");
+        throw new IncompatibleTypeException("CustomObject at key "+key+" is not of type Array");
     }
 
-    public Object getObject(String key) throws Exception {
+    public CustomObject getObject(String key) throws Exception {
         if(!database.containsKey(key)) {
             throw new KeyNotFoundException("No such key as " + key);
         }
 
         if(database.get(key) instanceof Array){
-            return (Object) database.get(key);
+            return (CustomObject) database.get(key);
         }
-        throw new IncompatibleTypeException("Object at key "+key+" is not of type Object");
+        throw new IncompatibleTypeException("CustomObject at key "+key+" is not of type CustomObject");
     }
 
-    public java.lang.Object get(String key) throws Exception {
+    public Object get(String key) throws Exception {
         if(!database.containsKey(key)) {
             throw new KeyNotFoundException("No such key as " + key);
         }
