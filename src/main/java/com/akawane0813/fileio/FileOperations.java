@@ -12,9 +12,9 @@ public class FileOperations {
     ObjectOutputStream objectOutputStream;
     ObjectInputStream objectInputStream;
 
-    public boolean writeObjectToFile(String fileName, Object serObj) {
+    public boolean writeObjectToFile(File file, Object serObj) {
         try {
-            fileOutputStream = new FileOutputStream(fileName);
+            fileOutputStream = new FileOutputStream(file);
             objectOutputStream = new ObjectOutputStream(fileOutputStream);
             objectOutputStream.writeObject(serObj);
             objectOutputStream.close();
@@ -27,10 +27,10 @@ public class FileOperations {
         }
     }
 
-    public Object readObjectFromFile(String fileName){
+    public Object readObjectFromFile(File file){
         try {
 
-            fileInputStream = new FileInputStream(fileName);
+            fileInputStream = new FileInputStream(file);
             objectInputStream = new ObjectInputStream(fileInputStream);
 
             Object object = objectInputStream.readObject();
@@ -46,11 +46,11 @@ public class FileOperations {
     }
 
 
-    public List<String> readCommandsFromFile() throws IOException {
+    public List<String> readCommandsFromFile(File file) throws IOException {
         List<String> result = new ArrayList<>();
         Scanner scanner = null;
         try {
-            fileInputStream = new FileInputStream(FILEPATH_TO_STORE_COMMANDS);
+            fileInputStream = new FileInputStream(file);
             scanner = new Scanner(fileInputStream, "UTF-8");
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
@@ -69,7 +69,7 @@ public class FileOperations {
         return result;
     }
 
-    public boolean writeCommandsToFile(String value) {
+    public boolean writeCommandsToFile(File file, String value) {
         try{
             fileOutputStream = new FileOutputStream(FILEPATH_TO_STORE_COMMANDS, true);
             byte[] strToBytes = value.getBytes();
@@ -82,7 +82,7 @@ public class FileOperations {
         }
     }
 
-    public static void clearFile(String file) {
+    public static void clearFile(File file) {
         FileWriter fileWriter = null;
         try {
             fileWriter = new FileWriter(file, false);

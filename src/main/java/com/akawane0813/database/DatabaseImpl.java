@@ -30,28 +30,17 @@ public class DatabaseImpl implements Serializable, Database {
 
     //load BookList from memento if available
     private void initializeDatabase() {
-        FileOperations fileOperation = new FileOperations();
-        DatabaseImpl restoredDBState = (DatabaseImpl) fileOperation.readObjectFromFile(DATABASE_MEMENTO_FILEPATH);
-        if(restoredDBState != null) {
-            restore(restoredDBState);
-        }
-        else {
-            database = new HashMap<>();
+        recover();
+        if(database == null){
+            database = new HashMap();
         }
     }
 
     private void backup() {
         counterForBackUp++;
         if(counterForBackUp == intervalForBackup) {
-
-            FileOperations fileOperation = new FileOperations();
-            fileOperation.writeObjectToFile(DATABASE_MEMENTO_FILEPATH, this);
-
-//            //clear file
-//            FileOperation.clearFile(BOOK_LIST_MEMENTO_TEMP_FILE);
-            FileOperations.clearFile(COMMANDS_FILEPATH);
-
-            //resets counter
+//            need to modify code for custom files given to snapshot
+            snapshot();
             counterForBackUp = 0;
         }
     }
@@ -125,23 +114,41 @@ public class DatabaseImpl implements Serializable, Database {
 
     public void snapshot(){
 
+        FileOperations fileOperation = new FileOperations();
+        fileOperation.writeObjectToFile(new File(DATABASE_MEMENTO_FILEPATH), this);
+
+//        clears the commands from file after backup
+        FileOperations.clearFile(new File(COMMANDS_FILEPATH));
     }
 
     public void snapshot(File commands, File dbSnapshot){
+        FileOperations fileOperation = new FileOperations();
+        fileOperation.writeObjectToFile(dbSnapshot, this);
 
+//        clears the commands from file after backup
+        FileOperations.clearFile(commands);
     }
 
     public void recover(){
-
-    }
-
-    public void recover(File commands, File dbSnapshot){
-
-    }
-
-    public void restore(DatabaseImpl databaseMemento){
-        if(databaseMemento != null) {
-            database = databaseMemento.database;
+        FileOperations fileOperation = new FileOperations();
+        DatabaseImpl restoredDB =
+                (DatabaseImpl) fileOperation.readObjectFromFile(new File(DATABASE_MEMENTO_FILEPATH));
+        if(restoredDB != null) {
+            database = restoredDB.database;
         }
+        // CODE TO RE-EXECUTE COMMANDS FROM commands FILE INTO EXISTING OBJECT
+    }
+
+    public void clear(){
+        FileOperations.clearFile(new File(DATABASE_MEMENTO_FILEPATH));
+    }
+    public void recover(File commands, File dbSnapshot){
+        FileOperations fileOperation = new FileOperations();
+        DatabaseImpl restoredDB =
+                (DatabaseImpl) fileOperation.readObjectFromFile(dbSnapshot);
+        if(restoredDB != null) {
+            database = restoredDB.database;
+        }
+        // CODE TO RE-EXECUTE COMMANDS FROM commands FILE INTO EXISTING OBJECT
     }
 }
