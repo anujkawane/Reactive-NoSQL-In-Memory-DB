@@ -41,6 +41,7 @@ public class FileOperations {
             return object;
 
         } catch (Exception ex) {
+            ex.printStackTrace();
             return null;
         }
     }

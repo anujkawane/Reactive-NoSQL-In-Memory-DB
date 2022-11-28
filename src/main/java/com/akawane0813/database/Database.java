@@ -6,20 +6,21 @@ import com.akawane0813.fileio.FileOperations;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Database implements Serializable, IDatabase {
 
-    private Map<String, Object> database;
+    private DataStore database;
     private final String DATABASE_MEMENTO_FILEPATH = "src/main/resources/dbSnapshot.txt";
     private final String COMMANDS_FILEPATH = "src/main/resources/commands.txt";
     private int counterForBackUp = 0;
     private final int intervalForBackup = 5;
 
+    long END_TIME = System.currentTimeMillis() + 5 * 1000;
+
+
     @Override
     public String toString() {
-        return "Database" +
+        return "" +
                 database +
                 "";
     }
@@ -32,23 +33,27 @@ public class Database implements Serializable, IDatabase {
     private void initializeDatabase() {
         recover();
         if(database == null){
-            database = new HashMap();
+            database = new DataStore();
         }
     }
 
     private void backup() {
-        counterForBackUp++;
-        if(counterForBackUp == intervalForBackup) {
-//            need to modify code for custom files given to snapshot
+//        counterForBackUp++;
+        if(System.currentTimeMillis() > END_TIME){
             snapshot();
-            counterForBackUp = 0;
+            END_TIME = System.currentTimeMillis() + 5 * 1000;
         }
+//        if(counterForBackUp == intervalForBackup) {
+////            need to modify code for custom files given to snapshot
+//            snapshot();
+//            counterForBackUp = 0;
+//        }
     }
 
-    public Database put(String key, Object value){
+    public boolean put(String key, Object value){
         database.put(key, value);
         backup();
-        return this;
+        return true;
     }
 
     public String getString(String key) throws Exception {
@@ -115,7 +120,7 @@ public class Database implements Serializable, IDatabase {
     public void snapshot(){
 
         FileOperations fileOperation = new FileOperations();
-        fileOperation.writeObjectToFile(new File(DATABASE_MEMENTO_FILEPATH), this);
+        fileOperation.writeObjectToFile(new File(DATABASE_MEMENTO_FILEPATH), database);
 
 //        clears the commands from file after backup
         FileOperations.clearFile(new File(COMMANDS_FILEPATH));
@@ -123,7 +128,7 @@ public class Database implements Serializable, IDatabase {
 
     public void snapshot(File commands, File dbSnapshot){
         FileOperations fileOperation = new FileOperations();
-        fileOperation.writeObjectToFile(dbSnapshot, this);
+        fileOperation.writeObjectToFile(dbSnapshot, database);
 
 //        clears the commands from file after backup
         FileOperations.clearFile(commands);
@@ -131,10 +136,10 @@ public class Database implements Serializable, IDatabase {
 
     public void recover(){
         FileOperations fileOperation = new FileOperations();
-        Database restoredDB =
-                (Database) fileOperation.readObjectFromFile(new File(DATABASE_MEMENTO_FILEPATH));
+        DataStore restoredDB =
+                (DataStore) fileOperation.readObjectFromFile(new File(DATABASE_MEMENTO_FILEPATH));
         if(restoredDB != null) {
-            database = restoredDB.database;
+            database = restoredDB;
         }
         // CODE TO RE-EXECUTE COMMANDS FROM commands FILE INTO EXISTING OBJECT
     }
@@ -145,10 +150,10 @@ public class Database implements Serializable, IDatabase {
 
     public void recover(File commands, File dbSnapshot){
         FileOperations fileOperation = new FileOperations();
-        Database restoredDB =
-                (Database) fileOperation.readObjectFromFile(dbSnapshot);
+        DataStore restoredDB =
+                (DataStore) fileOperation.readObjectFromFile(dbSnapshot);
         if(restoredDB != null) {
-            database = restoredDB.database;
+            database = restoredDB;
         }
         // CODE TO RE-EXECUTE COMMANDS FROM commands FILE INTO EXISTING OBJECT
     }

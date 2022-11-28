@@ -10,7 +10,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class CustomObject implements Serializable, ICustomObject {
 
@@ -78,7 +77,7 @@ public class CustomObject implements Serializable, ICustomObject {
 
     public void setParentForNestedValue(String parent) {
         setParent(parent);
-        this.map.forEach((k,v)->{
+        map.forEach((k,v)->{
             if(v instanceof Array) {
                 ((Array)v).setParentForNestedValue(parent + "."+ k);
             } else if(v instanceof CustomObject) {
@@ -112,10 +111,10 @@ public class CustomObject implements Serializable, ICustomObject {
         object.map.forEach((k,v) -> {
             if (v instanceof Array) {
                 Array arr = new Array();
-                ArrayList a = arr.convertToArrayList((Array)v);
+                ArrayList<Object> a = arr.convertToArrayList((Array)v);
                 map.put((String) k,a);
             }else if (v instanceof CustomObject) {
-                HashMap a = convertToHashMap((CustomObject) v);
+                HashMap<String, Object> a = convertToHashMap((CustomObject) v);
                 map.put((String) k,a);
             } else {
                 map.put((String) k,v);
@@ -125,7 +124,7 @@ public class CustomObject implements Serializable, ICustomObject {
     }
 
     public String toString(){
-        HashMap map = convertToHashMap(this);
+        HashMap<String, Object> map = convertToHashMap(this);
         if(gson == null) gson = new Gson();
         return gson.toJson(map);
     }

@@ -18,8 +18,7 @@ public class Test {
         String COMMANDS_FILEPATH = "src/main/resources/commands.txt";
         String DATABASE_MEMENTO_FILEPATH = "src/main/resources/dbSnapshot.txt";
 
-//        Database db = new Database();
-//
+        Database db = new Database();
 //        Array a = new Array();
 //        a.put("ANUJ");
 //        a.put(1);
@@ -57,57 +56,39 @@ public class Test {
 //        db.put("BHUV" , 930);
 
 
-//        System.out.println(db);
-
-
+        System.out.println(db);
+//
+//
 //        System.out.println(db);
 //        db.clear();
 //
 //        System.out.println(db);
-
+//
 //        db.put("Array", 10);
 //        System.out.println(db);
 //        db.recover();
 
 
 
-        Array firstArr = new Array();
-        ArrayExecuter array = new ArrayExecuter(firstArr);
-
-        CustomObject secondObj = new CustomObject();
-        CustomObject thirdObj = new CustomObject();
-        thirdObj.put("NEW", "NEW");
-
-        secondObj.put("Kp",1);
-        firstArr.put(secondObj);
-        DatabaseExecutor db = new DatabaseExecutor(new Database());
-        db.put("KP",firstArr);
-        db.put("KKK",1);
-        db.put("dasd",2);
-        db.put("KasdasdadP",3);
-        db.put("KdsadsaddasdsadsadP",4);
+//        Array firstArr = new Array();
+//        ArrayExecuter array = new ArrayExecuter(firstArr);
 //
-        db.getArray("KP").getObject(0).put("Abhi",thirdObj);
-        db.getArray("KP").put("Anuj");
+//        CustomObject secondObj = new CustomObject();
+//        CustomObject thirdObj = new CustomObject();
+//        thirdObj.put("NEW", "NEW");
+//
+//        secondObj.put("Kp",1);
+//        firstArr.put(secondObj);
+//        DatabaseExecutor db = new DatabaseExecutor(new Database());
+//        db.put("KP",firstArr);
+//        db.put("KKK",1);
+//        db.put("dasd",2);
+//        db.put("KasdasdadP",3);
+//        db.put("KdsadsaddasdsadsadP",4);
+////
+//        db.getArray("KP").getObject(0).put("Abhi",thirdObj);
+//        db.getArray("KP").put("Anuj");
 
-        System.out.println(db.get("KP"));
-        FileOperations fileOperation = new FileOperations();
-
-        try {
-            List<String> res = fileOperation.readCommandsFromFile(new File(COMMANDS_FILEPATH));
-            System.out.println(res);
-//            Gson gson = new Gson();
-//            Type expectedType = new TypeToken<ArrayList<Object>>(){}.getType();
-//            ArrayList object = gson.fromJson(res.get(0), expectedType);
-            Array abc = new Array();
-            String[] r = res.get(1).split(":");
-            Array ac = abc.fromString(r[r.length-1]);
-            System.out.println(ac.get(0));
-            System.out.println(ac.get(1));
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
+//        System.out.println(db);
     }
 }

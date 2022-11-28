@@ -114,14 +114,14 @@ public class Array implements Serializable, IArray{
     }
 
     public ArrayList<Object> convertToArrayList(Array array) {
-        ArrayList newArrayList = new ArrayList<>();
+        ArrayList<Object> newArrayList = new ArrayList<>();
 
         array.objectList.forEach(v -> {
             if (v instanceof Array) {
-                ArrayList a = this.convertToArrayList((Array)v);
+                ArrayList<Object> a = this.convertToArrayList((Array)v);
                 newArrayList.add(a);
             }else if (v instanceof CustomObject) {
-                HashMap a = new CustomObject().convertToHashMap((CustomObject) v);
+                HashMap<String, Object> a = new CustomObject().convertToHashMap((CustomObject) v);
                 newArrayList.add(a);
             } else {
                 newArrayList.add(v);
@@ -132,7 +132,7 @@ public class Array implements Serializable, IArray{
 
     @Override
     public String toString() {
-        ArrayList arr = convertToArrayList(this);
+        ArrayList<Object> arr = convertToArrayList(this);
         if(gson == null) gson = new Gson() ;
         return gson.toJson(arr);
     }
