@@ -22,18 +22,19 @@ public class Array implements Serializable, IArray{
         gson = new Gson();
     }
 
-    public void setParent(String parent) {
-        this.parent = parent;
-    }
 
-    public void setParentForNestedValue(String parent) {
+//    public void setParent(String parent) {
+//        this.parent = parent;
+//    }
+
+    public void setParent(String parent) {
         int index = 0;
-        setParent(parent);
+        this.parent = parent;
         objectList.forEach((v)->{
             if(v instanceof Array) {
-                ((Array)v).setParentForNestedValue(parent+"."+"*index*" + index);
+                ((Array)v).setParent(parent);
             } else if (v instanceof CustomObject) {
-                ((CustomObject)v).setParentForNestedValue(parent+"."+"*index*"+ index
+                ((CustomObject)v).setParent(parent
                 );
             }
         });
@@ -41,9 +42,9 @@ public class Array implements Serializable, IArray{
 
     public boolean put(Object object){
         if (object instanceof Array) {
-            ((Array)object).setParentForNestedValue(getParent()+".*index*"+((Array) object).length());
+            ((Array)object).setParent(parent);
         } else if (object instanceof CustomObject) {
-            ((CustomObject)object).setParentForNestedValue(getParent()+".*index*"+((CustomObject)object).length());
+            ((CustomObject)object).setParent(parent);
         }
         objectList.add(object);
         return true;
@@ -135,6 +136,11 @@ public class Array implements Serializable, IArray{
         ArrayList<Object> arr = convertToArrayList(this);
         if(gson == null) gson = new Gson() ;
         return gson.toJson(arr);
+    }
+
+    public Object clone() throws CloneNotSupportedException
+    {
+        return fromString(toString());
     }
 
 

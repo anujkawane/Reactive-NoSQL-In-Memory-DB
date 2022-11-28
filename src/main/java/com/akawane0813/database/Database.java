@@ -1,8 +1,12 @@
 package com.akawane0813.database;
 
+import com.akawane0813.cursor.Cursor;
+import com.akawane0813.cursor.CursorMapper;
+import com.akawane0813.decorator.DatabaseExecutor;
 import com.akawane0813.exception.IncompatibleTypeException;
 import com.akawane0813.exception.KeyNotFoundException;
 import com.akawane0813.fileio.FileOperations;
+import com.akawane0813.transaction.Transaction;
 
 import java.io.File;
 import java.io.Serializable;
@@ -16,7 +20,7 @@ public class Database implements Serializable, IDatabase {
     private final int intervalForBackup = 5;
 
     long END_TIME = System.currentTimeMillis() + 5 * 1000;
-
+    private CursorMapper cursorMapper;
 
     @Override
     public String toString() {
@@ -27,6 +31,7 @@ public class Database implements Serializable, IDatabase {
 
     public Database(){
         initializeDatabase();
+        cursorMapper = CursorMapper.CursorMapper();
     }
 
     //load BookList from memento if available
@@ -52,7 +57,12 @@ public class Database implements Serializable, IDatabase {
 
     public boolean put(String key, Object value){
         database.put(key, value);
+
         backup();
+        Cursor cursor = cursorMapper.getCursor(key);
+        if(cursor != null ) {
+            cursor.updateObserver();
+        }
         return true;
     }
 
@@ -78,7 +88,7 @@ public class Database implements Serializable, IDatabase {
         throw new IncompatibleTypeException("CustomObject at key "+key+" is not of type Integer");
     }
 
-    public IArray getArray(String key) throws Exception {
+    public Array getArray(String key) throws Exception {
         if(!database.containsKey(key)) {
             throw new KeyNotFoundException("No such key as " + key);
         }
@@ -104,6 +114,7 @@ public class Database implements Serializable, IDatabase {
         if(!database.containsKey(key)) {
             throw new KeyNotFoundException("No such key as " + key);
         }
+
         return database.get(key);
     }
 
@@ -112,6 +123,11 @@ public class Database implements Serializable, IDatabase {
             throw new KeyNotFoundException("No such key as " + key);
         }
         Object removed =  database.remove(key);
+
+        Cursor cursor = cursorMapper.getCursor(key);
+        if(cursor != null ) {
+            cursor.updateObserver();
+        }
         backup();
         return removed;
     }
@@ -134,12 +150,34 @@ public class Database implements Serializable, IDatabase {
         FileOperations.clearFile(commands);
     }
 
+    public Cursor getCursor(String key) {
+        Cursor cursor = null;
+        try {
+            cursor = new Cursor(key, this);
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return cursor;
+    }
+
+    public Transaction transaction() {
+        return new Transaction(this);
+    }
+
+
     public void recover(){
         FileOperations fileOperation = new FileOperations();
         DataStore restoredDB =
                 (DataStore) fileOperation.readObjectFromFile(new File(DATABASE_MEMENTO_FILEPATH));
         if(restoredDB != null) {
             database = restoredDB;
+        }
+        try {
+            new DatabaseExecutor(this).executeSavedOperations(new File("src/main/resources/commands.txt"));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         // CODE TO RE-EXECUTE COMMANDS FROM commands FILE INTO EXISTING OBJECT
     }
@@ -154,6 +192,11 @@ public class Database implements Serializable, IDatabase {
                 (DataStore) fileOperation.readObjectFromFile(dbSnapshot);
         if(restoredDB != null) {
             database = restoredDB;
+        }
+        try {
+            new DatabaseExecutor(this).executeSavedOperations(commands);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         // CODE TO RE-EXECUTE COMMANDS FROM commands FILE INTO EXISTING OBJECT
     }

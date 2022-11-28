@@ -41,7 +41,6 @@ public class FileOperations {
             return object;
 
         } catch (Exception ex) {
-            ex.printStackTrace();
             return null;
         }
     }
@@ -88,7 +87,6 @@ public class FileOperations {
         try {
             fileWriter = new FileWriter(file, false);
         } catch (IOException e) {
-            e.printStackTrace();
         }
 
         PrintWriter printWriter = new PrintWriter(fileWriter, false);
@@ -98,7 +96,6 @@ public class FileOperations {
         try {
             fileWriter.close();
         } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }

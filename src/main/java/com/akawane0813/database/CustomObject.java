@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CustomObject implements Serializable, ICustomObject {
@@ -29,9 +30,9 @@ public class CustomObject implements Serializable, ICustomObject {
         }
 
         if (object instanceof Array) {
-            ((Array)object).setParentForNestedValue(getParent()+"."+key);
+            ((Array)object).setParent(parent);
         } else if (object instanceof CustomObject) {
-            ((CustomObject)object).setParentForNestedValue(getParent()+"."+key);
+            ((CustomObject)object).setParent(parent);
         }
 
         map.put(key,object);
@@ -75,17 +76,6 @@ public class CustomObject implements Serializable, ICustomObject {
         throw new IncompatibleTypeException("CustomObject at key "+key+" is not of type Array");
     }
 
-    public void setParentForNestedValue(String parent) {
-        setParent(parent);
-        map.forEach((k,v)->{
-            if(v instanceof Array) {
-                ((Array)v).setParentForNestedValue(parent + "."+ k);
-            } else if(v instanceof CustomObject) {
-                ((CustomObject) v).setParentForNestedValue(parent + "." + k);
-            }
-        });
-    }
-
     public String getParent() {
         return parent;
     }
@@ -102,7 +92,16 @@ public class CustomObject implements Serializable, ICustomObject {
     }
 
     public void setParent(String parent) {
+        int index = 0;
         this.parent = parent;
+        map.forEach((k,v)->{
+            if(v instanceof Array) {
+                ((Array)v).setParent(parent);
+            } else if (v instanceof CustomObject) {
+                ((CustomObject)v).setParent(parent
+                );
+            }
+        });
     }
 
     public HashMap<String,Object> convertToHashMap(CustomObject object) {
@@ -127,6 +126,11 @@ public class CustomObject implements Serializable, ICustomObject {
         HashMap<String, Object> map = convertToHashMap(this);
         if(gson == null) gson = new Gson();
         return gson.toJson(map);
+    }
+
+    public Object clone() throws CloneNotSupportedException
+    {
+        return fromString(toString());
     }
 
     public CustomObject fromString(String value) {
@@ -162,10 +166,8 @@ public class CustomObject implements Serializable, ICustomObject {
         return newCustomObject;
     }
 
-//    @Override
-//    public String toString() {
-//        return  (String) map.keySet().stream()
-//                .map(key -> key + "=" + map.get(key))
-//                .collect(Collectors.joining(", ", "{", "}"));
-//    }
+    public List<String> keys() {
+        return new ArrayList<>(map.keySet());
+
+    }
 }
