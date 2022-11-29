@@ -3,15 +3,15 @@ package com.akawane0813.observer;
 import java.util.List;
 
 public class Observer implements IObserver{
-    private List<String> updateMessages;
+    private List<String> logs;
     public Observer() {
 
     }
     public void update(String message) {
-        updateMessages.add(message);
+        logs.add(message);
     }
 
     public List<String> getUpdates(){
-        return updateMessages;
+        return logs;
     }
 }

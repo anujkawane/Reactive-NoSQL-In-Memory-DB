@@ -149,10 +149,6 @@ public class Array implements Serializable, IArray{
         return null;
     }
 
-    public int size(){
-        return objectList.size();
-    }
-
     /**
      * Converts String format into Array of Objects by parsing using Jackson JSON library
      * @param value String format of Array Objects

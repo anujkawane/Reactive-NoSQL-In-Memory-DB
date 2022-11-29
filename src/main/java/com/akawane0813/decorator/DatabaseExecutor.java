@@ -44,8 +44,8 @@ public class DatabaseExecutor implements IDatabase {
 
     public void executeSavedCommands(File commandFile) throws Exception {
         List<List<String>> commands;
-        if (commandFile == null) {
-            commands = executor.getCommands(new File(COMMANDS_FILEPATH));
+        if (commandFile != null) {
+            commands = executor.getCommands(commandFile);
         } else {
             commands = executor.getCommands(new File(COMMANDS_FILEPATH));
         }
@@ -60,20 +60,20 @@ public class DatabaseExecutor implements IDatabase {
 
         if (database.containsKey(key)) {
             database.remove(key);
-            put(key,parseValue(value));
+            put(key, getObjectFromString(value));
         } else {
-            put(key,parseValue(value));
+            put(key, getObjectFromString(value));
         }
     }
 
 
     /**
-     * Parse value to specific type of object bases on string format
-     * @param value String value which needs to be parse
+     * Parse value to specific type of object based on string format
+     * @param value String value which needs to be parsed
      * @return specific type of object
      * @throws JsonProcessingException if any in conversion of fromString
      */
-    public Object parseValue(String value) throws JsonProcessingException {
+    public Object getObjectFromString(String value) throws JsonProcessingException {
 
         if (value.charAt(0) == '[') {
             return new Array().fromString(value);
@@ -85,7 +85,6 @@ public class DatabaseExecutor implements IDatabase {
         } else {
             return value;
         }
-
     }
 
     public String toString() {
@@ -104,7 +103,7 @@ public class DatabaseExecutor implements IDatabase {
 
         put.execute(this.database);
 
-        insertSuperKeyInEveryChild(key, value);
+        insertSuperKey(key, value);
         String commandString = "PUT->" + key + "->" + database.get(key).toString();
         if (stack == null) {
             executor.writeToFile(commandString);
@@ -121,7 +120,7 @@ public class DatabaseExecutor implements IDatabase {
      * @param key in database where value will be stored
      * @param value to store in DB against given key
      */
-    public void insertSuperKeyInEveryChild(String key,Object value) {
+    public void insertSuperKey(String key, Object value) {
         if(value instanceof Array) {
             ((Array)value).setParent(key);
         } else if (value instanceof CustomObject) {
@@ -129,7 +128,6 @@ public class DatabaseExecutor implements IDatabase {
             );
         }
     }
-
 
     public Object get(String key) throws Exception {
         return this.database.get(key);
@@ -194,9 +192,7 @@ public class DatabaseExecutor implements IDatabase {
     }
 
     public void commitCommands() {
-        this.commandStrings.forEach((operation) -> {
-            executor.writeToFile(operation);
-        });
+        this.commandStrings.forEach((operation) -> executor.writeToFile(operation));
         snapshot();
     }
 

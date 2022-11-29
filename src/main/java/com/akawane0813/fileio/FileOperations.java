@@ -46,7 +46,7 @@ public class FileOperations {
     }
 
 
-    public List<String> readCommandsFromFile(File file) throws IOException {
+    public List<String> readCommandsFromFile(File file){
         List<String> result = new ArrayList<>();
         Scanner scanner;
         try {
@@ -86,6 +86,7 @@ public class FileOperations {
         try {
             fileWriter = new FileWriter(file, false);
         } catch (IOException e) {
+            e.printStackTrace();
         }
 
         PrintWriter printWriter = new PrintWriter(fileWriter, false);
@@ -95,6 +96,7 @@ public class FileOperations {
         try {
             fileWriter.close();
         } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

@@ -9,7 +9,7 @@ import java.io.Serializable;
 public class DatabasePutCommand implements IDatabaseCommands, Serializable {
 
     private final Object object;
-    private Database db;
+    private Database database;
     private String key;
 
     public DatabasePutCommand(String key, Object object) {
@@ -18,13 +18,12 @@ public class DatabasePutCommand implements IDatabaseCommands, Serializable {
     }
 
     @Override
-    public Object execute(Object db) {
-        this.db = (Database) db;
-        return this.db.put(key, object);
+    public Object execute(Object database) {
+        this.database = (Database) database;
+        return this.database.put(key, object);
     }
 
     public Object undo() throws KeyNotFoundException {
-        return db.remove(key);
+        return database.remove(key);
     }
-
 }

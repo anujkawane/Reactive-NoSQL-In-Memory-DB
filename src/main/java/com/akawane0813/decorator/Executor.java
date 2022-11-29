@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 public class Executor {
 
     private final String COMMANDS_FILEPATH = "src/main/resources/commands.txt";
-    private Database db;
+    private Database database;
     private FileOperations fileOperation;
 
     protected File commandFile;
@@ -26,18 +26,18 @@ public class Executor {
         return executor;
     }
 
-    public static Executor Executor() {
+    public static Executor getInstance() {
         return executor;
     }
 
     private Executor(Database database, File commandFile) {
         this.commandFile = commandFile;
-        db = database;
+        this.database = database;
         fileOperation = new FileOperations();
     }
 
     public Database getDatabase() {
-        return db;
+        return database;
     }
 
     /**
@@ -47,19 +47,15 @@ public class Executor {
      */
     public List<List<String>> getCommands(File file ) {
         List<List<String>> commands = new ArrayList<>();
-        try {
-            List<String> operations = fileOperation.readCommandsFromFile(file);
-            for (String operation : operations) {
-                if(operation.length()>0) {
-                    String[] res = operation.split("->");
-                    List<String> resp = Arrays.stream(res).collect(Collectors.toList());
-                    commands.add(resp);
-                }
+        List<String> operations = fileOperation.readCommandsFromFile(file);
+        for (String operation : operations) {
+            if(operation.length()>0) {
+                String[] res = operation.split("->");
+                List<String> resp = Arrays.stream(res).collect(Collectors.toList());
+                commands.add(resp);
             }
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
+
         fileOperation.clearFile(file);
         return commands;
     }

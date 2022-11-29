@@ -9,14 +9,14 @@ import com.akawane0813.exception.KeyNotFoundException;
 
 public class ArrayExecutor implements IArray {
     private Array array;
-    private Database db;
+    private Database database;
     private String parent = "";
     private Executor executor;
     public ArrayExecutor(IArray array) {
-        executor = Executor.Executor();
+        executor = Executor.getInstance();
         this.array = (Array)array;
         if (executor != null) {
-            db = executor.getDatabase();
+            database = executor.getDatabase();
         }
     }
 
@@ -26,7 +26,7 @@ public class ArrayExecutor implements IArray {
         Boolean response = (boolean)put.execute(this.array);
 
         try {
-            executor.writeToFile( "PUT->" + array.getParent() + "->" +db.get(array.getParent()).toString());
+            executor.writeToFile( "PUT->" + array.getParent() + "->" + database.get(array.getParent()).toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -73,7 +73,7 @@ public class ArrayExecutor implements IArray {
 
         Object value = remove.execute(this.array);
 
-        executor.writeToFile(  "PUT->" + array.getParent() + "->" + db.get(array.getParent()).toString());
+        executor.writeToFile(  "PUT->" + array.getParent() + "->" + database.get(array.getParent()).toString());
         return value;
     }
 }

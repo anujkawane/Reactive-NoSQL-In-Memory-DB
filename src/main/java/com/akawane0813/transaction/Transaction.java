@@ -21,7 +21,7 @@ public class Transaction implements IDatabase {
         this.database = database;
         databaseExecutor = new DatabaseExecutor(this.database,operations);
     }
-    public boolean put(String key, Object value) throws KeyNotFoundException {
+    public boolean put(String key, Object value) {
         boolean response = false;
         try {
             response = databaseExecutor.put(key,value);

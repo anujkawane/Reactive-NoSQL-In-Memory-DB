@@ -12,20 +12,19 @@ import com.akawane0813.fileio.FileOperations;
 public class ObjectExecutor implements ICustomObject {
     private CustomObject customObject;
     private FileOperations fileOperation;
-    private String parent;
     private Executor executor;
     private Database database;
     public ObjectExecutor(ICustomObject db) {
         this.customObject = (CustomObject) db;
         this.fileOperation = new FileOperations();
-        executor = Executor.Executor();
+        executor = Executor.getInstance();
         database= executor.getDatabase();
     }
 
     public boolean put(String key, Object value) throws KeyNotFoundException {
         IDatabaseCommands put = new ObjectPutCommand(key,value);
 
-        Boolean res = (boolean)put.execute(this.customObject);
+        boolean res = (boolean)put.execute(this.customObject);
 
         Object newValue;
         try {
