@@ -21,17 +21,17 @@ public class Executor {
 
     protected File commandFile;
 
-    private static Executor singleInstance = null;
+    private static Executor executor = null;
 
-    public static Executor Executor(Database db, File commandFile) {
-        if(singleInstance == null) {
-            singleInstance = new Executor( db, commandFile);
+    public static Executor getInstance(Database db, File commandFile) {
+        if(executor == null) {
+            executor = new Executor( db, commandFile);
         }
-        return singleInstance;
+        return executor;
     }
 
     public static Executor Executor() {
-        return singleInstance;
+        return executor;
     }
 
 //    private Executor(Boolean isSavedOperation, Database database) {
@@ -50,7 +50,7 @@ public class Executor {
         return db;
     }
 
-    public List<List<String>> retrieveOperations(File file ) {
+    public List<List<String>> getCommands(File file ) {
         List<List<String>> commands = new ArrayList<>();
         try {
             List<String> operations = fileOperation.readCommandsFromFile(file);

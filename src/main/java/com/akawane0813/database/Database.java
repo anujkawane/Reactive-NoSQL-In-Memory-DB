@@ -1,7 +1,7 @@
 package com.akawane0813.database;
 
 import com.akawane0813.cursor.Cursor;
-import com.akawane0813.cursor.CursorMapper;
+import com.akawane0813.cursor.CursorTracker;
 import com.akawane0813.decorator.DatabaseExecutor;
 import com.akawane0813.exception.IncompatibleTypeException;
 import com.akawane0813.exception.KeyNotFoundException;
@@ -19,7 +19,7 @@ public class Database implements Serializable, IDatabase {
     private final int BACKUP_INTERVAL_SECONDS = 5;
 
     long END_TIME = System.currentTimeMillis() + BACKUP_INTERVAL_SECONDS * 1000;
-    private final CursorMapper cursorMapper = CursorMapper.CursorMapper();
+    private final CursorTracker cursorTracker = CursorTracker.getInstance();
 
     @Override
     public String toString() {
@@ -50,7 +50,7 @@ public class Database implements Serializable, IDatabase {
         database.put(key, value);
 
         backup();
-        Cursor cursor = cursorMapper.getCursor(key);
+        Cursor cursor = cursorTracker.getCursor(key);
         if(cursor != null ) {
             cursor.updateObserver();
         }
@@ -126,7 +126,7 @@ public class Database implements Serializable, IDatabase {
         }
         Object removed =  database.remove(key);
 
-        Cursor cursor = cursorMapper.getCursor(key);
+        Cursor cursor = cursorTracker.getCursor(key);
         if(cursor != null ) {
             cursor.updateObserver();
         }

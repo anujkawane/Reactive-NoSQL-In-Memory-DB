@@ -19,7 +19,7 @@ public class Cursor {
 
     public List<IObserver> observers = new ArrayList<>();
 
-    private CursorMapper mapper = CursorMapper.CursorMapper();
+    private CursorTracker cursorTracker = CursorTracker.getInstance();
     public Cursor(String key, Database db) throws Exception {
 
         this.db = db;
@@ -32,7 +32,7 @@ public class Cursor {
             this.currentValue = ((CustomObject)this.db.get(key)).clone();
         }
 
-        mapper.put(key,this);
+        cursorTracker.put(key,this);
     }
     
     public boolean updateObserver() {

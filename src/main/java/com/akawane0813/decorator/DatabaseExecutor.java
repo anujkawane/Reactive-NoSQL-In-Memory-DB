@@ -23,12 +23,12 @@ public class DatabaseExecutor implements IDatabase {
 
     public DatabaseExecutor(Database db) {
         this.database = db;
-        executor = Executor.Executor(db,new File("commands.txt"));
+        executor = Executor.getInstance(db,new File("commands.txt"));
 
     }
 
     public DatabaseExecutor(Database db, File commandFile) {
-        executor = Executor.Executor(db,commandFile);
+        executor = Executor.getInstance(db,commandFile);
         this.database = db;
         this.commandFile = commandFile;
     }
@@ -44,9 +44,9 @@ public class DatabaseExecutor implements IDatabase {
     public void executeSavedOperations(File commandFile) throws Exception {
         List<List<String>> operations;
         if (commandFile == null) {
-            operations = executor.retrieveOperations(new File("src/main/resources/commands.txt"));
+            operations = executor.getCommands(new File("src/main/resources/commands.txt"));
         } else {
-            operations = executor.retrieveOperations(new File("src/main/resources/commands.txt"));
+            operations = executor.getCommands(new File("src/main/resources/commands.txt"));
         }
         for (List<String> operation : operations) {
             executeOperation(operation);

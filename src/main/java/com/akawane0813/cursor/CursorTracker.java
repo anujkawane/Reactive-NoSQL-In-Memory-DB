@@ -2,20 +2,19 @@ package com.akawane0813.cursor;
 
 import java.util.HashMap;
 
-public class CursorMapper {
-    private static CursorMapper singleInstance = null;
+public class CursorTracker {
+    private static CursorTracker cursorTracker;
 
-    private HashMap<String,Cursor> map;
+    private HashMap<String,Cursor> map = new HashMap<>();
 
-    private CursorMapper() {
-        this.map = new HashMap<>();
-    }
+    private CursorTracker() {}
 
-    public static CursorMapper CursorMapper() {
-        if(singleInstance == null) {
-            singleInstance = new CursorMapper();
+    public static CursorTracker getInstance() {
+        if(cursorTracker != null) {
+            return cursorTracker;
         }
-        return singleInstance;
+        cursorTracker = new CursorTracker();
+        return cursorTracker;
     }
 
     public boolean put(String key, Cursor cursor) {
@@ -40,10 +39,4 @@ public class CursorMapper {
         return null;
     }
 
-    public void notifyCursor(String key) {
-        if (this.map.containsKey(key)) {
-            Cursor cursor = this.map.get(key);
-            cursor.updateObserver();
-        }
-    }
 }

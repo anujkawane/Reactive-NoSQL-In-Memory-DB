@@ -11,7 +11,9 @@ import java.util.*;
 public class Array implements Serializable, IArray{
 
     List objectList;
+
     transient Gson gson;
+
     private String parent = "";
 
     public Array(){
