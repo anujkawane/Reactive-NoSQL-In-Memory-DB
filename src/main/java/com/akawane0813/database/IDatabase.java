@@ -6,6 +6,8 @@ public interface IDatabase {
 
     int getInt(String key) throws Exception;
 
+    Double getDouble(String key) throws Exception;
+
     IArray getArray(String key) throws Exception;
 
     ICustomObject getObject(String key) throws Exception;

@@ -39,10 +39,10 @@ public class Cursor {
         String message = "";
         try {
             Object newValue = this.db.get(key);
-            message = "The " + key + " in the database has been updated. Old Value :- " + this.currentValue.toString() + " New Value :- " + newValue.toString();
+            message =  key + " in the DB updated with "+newValue.toString();
 
         } catch(KeyNotFoundException e) {
-            message = "The " + key + " has been removed from the database";
+            message = key + " removed from the DB";
         } catch (Exception e) {
             e.printStackTrace();
         }

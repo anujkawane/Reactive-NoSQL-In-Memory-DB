@@ -119,6 +119,10 @@ public class DatabaseExecutor implements IDatabase {
         return this.database.getInt(key);
     }
 
+    public Double getDouble(String key) throws Exception {
+        return this.database.getDouble(key);
+    }
+
     public String getString(String key) throws Exception {
         return this.database.getString(key);
     }
