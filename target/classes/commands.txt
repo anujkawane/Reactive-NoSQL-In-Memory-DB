@@ -1,0 +1,4 @@
+
+DB#PUT#{"CustomDOB":["March",26.0,1996.0]}#DOB
+DB#PUT#30#AGE
+ARRAY#PUT#KAWANE#Name.(2).
