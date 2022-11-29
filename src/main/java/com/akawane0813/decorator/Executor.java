@@ -56,10 +56,9 @@ public class Executor {
         List<List<String>> commands = new ArrayList<>();
         try {
             List<String> operations = fileOperation.readCommandsFromFile(file);
-
             for (String operation : operations) {
                 if(operation.length()>0) {
-                    String[] res = operation.split("#");
+                    String[] res = operation.split(" ");
                     List<String> resp = Arrays.stream(res).collect(Collectors.toList());
                     commands.add(resp);
                 }

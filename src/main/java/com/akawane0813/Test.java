@@ -10,32 +10,39 @@ public class Test {
 
     public static void main(String[] args) throws Exception {
 
-        String COMMANDS_FILEPATH = "src/main/resources/commands.txt";
-        String DATABASE_MEMENTO_FILEPATH = "src/main/resources/dbSnapshot.txt";
-
-//        Array array = new Array();
-//        array.put("Anuj");
-//        array.put(26);
-//
-//        Array dob = new Array();
-//        dob.put("March");
-//        dob.put(26);
-//        dob.put(1996);
-//
-//        CustomObject customObject = new CustomObject();
-//        customObject.put("CustomDOB", dob);
-//
         DatabaseExecutor databaseExecutor = new DatabaseExecutor(new Database());
-//
-//        databaseExecutor.put("Name", array);
-//        Thread.sleep(5000);
-//        databaseExecutor.put("DOB", customObject);
-//        databaseExecutor.put("AGE", 30);
-//
-//        Thread.sleep(5001);
-//        databaseExecutor.getArray("Name").put("KAWANE");
 
-        Thread.sleep(5001);
+
+        Array array = new Array();
+        array.put("Anuj");
+        array.put(26);
+
+        Array dob = new Array();
+        dob.put("March");
+        dob.put(26);
+        dob.put(1996);
+
+        CustomObject customObject = new CustomObject();
+        customObject.put("CustomDOB", dob);
+
+
+        databaseExecutor.put("Name", array);
+        databaseExecutor.put("DOB", customObject);
+
+
+        databaseExecutor.getArray("Name").put("Kshitij");
+        databaseExecutor.put("AGE", 30);
+
+        Thread.sleep(6000);
+
+        CustomObject newCO = new CustomObject();
+        newCO.put("Test1", "test1");
+        newCO.put("Test2", "test2");
+
+        databaseExecutor.put("TEST", newCO);
+
+        databaseExecutor.getObject("TEST").remove("Test2");
+
         System.out.println(databaseExecutor);
     }
 }

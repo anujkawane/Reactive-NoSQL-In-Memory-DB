@@ -10,5 +10,6 @@ public interface ICustomObject {
 
     public Object remove(String key) throws KeyNotFoundException;
 
+
     public ICustomObject getObject(String key) throws IncompatibleTypeException;
 }

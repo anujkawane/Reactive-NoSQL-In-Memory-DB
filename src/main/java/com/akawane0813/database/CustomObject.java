@@ -166,6 +166,10 @@ public class CustomObject implements Serializable, ICustomObject {
         return newCustomObject;
     }
 
+    public int size(){
+        return map.size();
+    }
+
     public List<String> keys() {
         return new ArrayList<>(map.keySet());
 

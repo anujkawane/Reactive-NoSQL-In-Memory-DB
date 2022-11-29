@@ -138,6 +138,9 @@ public class Array implements Serializable, IArray{
         return fromString(toString());
     }
 
+    public int size(){
+        return objectList.size();
+    }
 
     public Array fromString(String value) {
         Array newArray = new Array();

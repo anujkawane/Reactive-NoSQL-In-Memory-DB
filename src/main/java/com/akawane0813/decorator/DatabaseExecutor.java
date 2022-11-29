@@ -54,86 +54,15 @@ public class DatabaseExecutor implements IDatabase {
     }
 
     public void executeOperation(List<String> operations) throws Exception {
-        String operation = operations.get(1) + " " +operations.get(0);
+        String key = operations.get(1);
         String value = operations.get(2);
-        String key = operations.get(3);
-        List<String> listOfKeys = getKeys(key);
 
-        switch(operation) {
-            case "PUT DB" :
-                put(key,parseValue(value));
-                break;
-            case "REMOVE DB" :
-                remove(key);
-                break;
-            case "PUT ARRAY":
-            case "PUT CustomObject":
-                insertValueIntoNestedKeys(listOfKeys,value);
-                break;
-            case "REMOVE ARRAY":
-            case "REMOVE CustomObject":
-                removeValueFromNestedKeys(listOfKeys);
-                break;
+        if (db.contains(key)) {
+            db.remove(key);
+            put(key,parseValue(value));
+        } else {
+            put(key,parseValue(value));
         }
-    }
-
-    public List<String> getKeys(String key) {
-        String[] keys = key.split("\\.");
-        return Arrays.stream(keys).collect(Collectors.toList());
-    }
-
-    public void removeValueFromNestedKeys(List<String> listOfKeys) throws Exception {
-        Object object = get(listOfKeys.get(0));
-        listOfKeys.remove(0);
-        int listSize = listOfKeys.size()-1;
-        int currentIndex = 0;
-
-        for (String key : listOfKeys) {
-            if( key.contains("(")) {
-                int index = Integer.parseInt(key.substring(1,key.length()-1));
-                if (currentIndex == listSize) {
-                    object = (new ArrayExecuter((Array) object)).remove(index);
-                } else {
-                    object = ((Array)(object)).get(index);
-                }
-            } else {
-                if (currentIndex == listSize) {
-                    object = (new DBObjectExecutor((CustomObject) object)).remove(key);
-                } else {
-                    object = ((CustomObject)object).get(key);
-
-                }
-            }
-            currentIndex++;
-        }
-
-    }
-
-    public void insertValueIntoNestedKeys(List<String> listOfKeys, String value) throws Exception {
-        Object object = get(listOfKeys.get(0));
-        listOfKeys.remove(0);
-        int listSize = listOfKeys.size()-1;
-        int currentIndex = 0;
-
-        for (String key : listOfKeys) {
-            if( key.contains("(")) {
-                int index = Integer.parseInt(key.substring(1,key.length()-1));
-                if (currentIndex == listSize) {
-                    object = (new ArrayExecuter((Array) object)).put(parseValue(value));
-                } else {
-                    object = ((Array)(object)).get(index);
-                }
-            } else {
-                if (currentIndex == listSize) {
-                    object = (new DBObjectExecutor((CustomObject) object)).put(key,parseValue(value));
-                } else {
-                    object = ((CustomObject)object).get(key);
-
-                }
-            }
-            currentIndex++;
-        }
-
     }
 
     public Object parseValue(String value) {
@@ -159,9 +88,10 @@ public class DatabaseExecutor implements IDatabase {
         IDatabaseOperation put = new PutOperationDatabase(key,value);
 
         put.execute(this.db);
+
         insertSuperKeyInEveryChild(key, value);
         if (stack == null) {
-            executor.writeToFile(put.toString() + key);
+            executor.writeToFile( "INSERT " + key + " " + db.get(key).toString());
         } else {
             this.stack.add(put);
 
@@ -196,8 +126,8 @@ public class DatabaseExecutor implements IDatabase {
         return new ArrayExecuter(this.db.getArray(key));
     }
 
-    public CustomObject getObject(String key) throws Exception {
-        return this.db.getObject(key);
+    public ICustomObject getObject(String key) throws Exception {
+        return new DBObjectExecutor(db.getObject(key));
     }
 
     public Object remove(String key) throws KeyNotFoundException {
@@ -206,7 +136,11 @@ public class DatabaseExecutor implements IDatabase {
         Object value = remove.execute(this.db);
 
         if (stack == null) {
-            executor.writeToFile(remove.toString() + key);
+            try {
+                executor.writeToFile("INSERT " + key +  " " + db.get(key).toString());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         } else {
             this.stack.add(remove);
 

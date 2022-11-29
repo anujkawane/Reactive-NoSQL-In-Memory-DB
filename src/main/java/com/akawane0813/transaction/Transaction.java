@@ -19,8 +19,6 @@ public class Transaction implements IDatabase {
     Stack<IDatabaseOperation> operations = new Stack<>();
     public Transaction(Database db){
         this.db = db;
-        System.out.println("Current db");
-        System.out.println(this.db.toString());
         databaseExecutor = new DatabaseExecutor(this.db,operations);
     }
     public boolean put(String key, Object value) throws KeyNotFoundException {
@@ -60,17 +58,12 @@ public class Transaction implements IDatabase {
 
     public boolean abort() throws KeyNotFoundException {
         this.operations = this.databaseExecutor.getCommands();
-        System.out.println("Command lit");
-        System.out.println(this.operations);
         while(!this.operations.isEmpty()) {
             IDatabaseOperation operation = this.operations.pop();
-            System.out.println(operation);
             operation.undo();
         }
         this.isActive = false;
-        System.out.println("Herre");
 
-        System.out.println(databaseExecutor.toString());
         databaseExecutor.snapshot();
         return true;
     }

@@ -17,5 +17,5 @@ public interface IArray {
 
     public ICustomObject getObject(int index) throws IncompatibleTypeException;
 
-    public Object remove(int index) throws KeyNotFoundException;
+    public Object remove(int index) throws Exception;
 }

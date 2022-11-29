@@ -16,10 +16,9 @@ public class Database implements Serializable, IDatabase {
     private DataStore database;
     private final String DATABASE_MEMENTO_FILEPATH = "src/main/resources/dbSnapshot.txt";
     private final String COMMANDS_FILEPATH = "src/main/resources/commands.txt";
-    private int counterForBackUp = 0;
-    private final int intervalForBackup = 5;
+    private final int BACKUP_INTERVAL_SECONDS = 5;
 
-    long END_TIME = System.currentTimeMillis() + 5 * 1000;
+    long END_TIME = System.currentTimeMillis() + BACKUP_INTERVAL_SECONDS * 1000;
     private CursorMapper cursorMapper = CursorMapper.CursorMapper();
 
     @Override
@@ -41,16 +40,10 @@ public class Database implements Serializable, IDatabase {
     }
 
     private void backup() {
-//        counterForBackUp++;
         if(System.currentTimeMillis() > END_TIME){
             snapshot();
-            END_TIME = System.currentTimeMillis() + 5 * 1000;
+            END_TIME = System.currentTimeMillis() + BACKUP_INTERVAL_SECONDS * 1000;
         }
-//        if(counterForBackUp == intervalForBackup) {
-////            need to modify code for custom files given to snapshot
-//            snapshot();
-//            counterForBackUp = 0;
-//        }
     }
 
     public boolean put(String key, Object value){
@@ -102,7 +95,7 @@ public class Database implements Serializable, IDatabase {
             throw new KeyNotFoundException("No such key as " + key);
         }
 
-        if(database.get(key) instanceof Array){
+        if(database.get(key) instanceof CustomObject){
             return (CustomObject) database.get(key);
         }
         throw new IncompatibleTypeException("CustomObject at key "+key+" is not of type CustomObject");
@@ -197,5 +190,9 @@ public class Database implements Serializable, IDatabase {
             e.printStackTrace();
         }
         // CODE TO RE-EXECUTE COMMANDS FROM commands FILE INTO EXISTING OBJECT
+    }
+
+    public boolean contains(String key) {
+        return database.containsKey(key);
     }
 }
