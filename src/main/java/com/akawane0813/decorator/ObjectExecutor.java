@@ -1,21 +1,21 @@
 package com.akawane0813.decorator;
 
 import com.akawane0813.command.IDatabaseOperation;
-import com.akawane0813.command.customObjectOperation.PutOperationDBObject;
-import com.akawane0813.command.customObjectOperation.RemoveOperationDBObject;
+import com.akawane0813.command.customObjectOperation.ObjectPut;
+import com.akawane0813.command.customObjectOperation.ObjectRemove;
 import com.akawane0813.database.*;
 import com.akawane0813.exception.IncompatibleTypeException;
 import com.akawane0813.exception.KeyNotFoundException;
 import com.akawane0813.fileio.FileOperations;
 
 
-public class DBObjectExecutor implements ICustomObject {
+public class ObjectExecutor implements ICustomObject {
     private CustomObject customObject;
     private FileOperations fileOperation;
     private String parent;
     private Executor executor;
     private Database database;
-    public DBObjectExecutor(ICustomObject db) {
+    public ObjectExecutor(ICustomObject db) {
         this.customObject = (CustomObject) db;
         this.fileOperation = new FileOperations();
         executor = Executor.Executor();
@@ -23,7 +23,7 @@ public class DBObjectExecutor implements ICustomObject {
     }
 
     public boolean put(String key, Object value) throws KeyNotFoundException {
-        IDatabaseOperation put = new PutOperationDBObject(key,value);
+        IDatabaseOperation put = new ObjectPut(key,value);
 
         Boolean res = (boolean)put.execute(this.customObject);
 
@@ -35,7 +35,7 @@ public class DBObjectExecutor implements ICustomObject {
             newValue = null;
         }
 
-        executor.writeToFile( "INSERT " + customObject.getParent() + "#" +newValue.toString() );
+        executor.writeToFile( "INSERT->" + customObject.getParent() + "->" +newValue.toString() );
 
         return res;
     }
@@ -54,20 +54,20 @@ public class DBObjectExecutor implements ICustomObject {
     }
 
     public IArray getArray(String key) throws IncompatibleTypeException {
-        return new ArrayExecuter(this.customObject.getArray(key));
+        return new ArrayExecutor(this.customObject.getArray(key));
     }
 
     public ICustomObject getObject(String key) throws IncompatibleTypeException {
-        return new DBObjectExecutor(this.customObject.getObject(key));
+        return new ObjectExecutor(this.customObject.getObject(key));
     }
 
     public Object remove(String key) throws KeyNotFoundException {
-        IDatabaseOperation remove = new RemoveOperationDBObject(key);
+        IDatabaseOperation remove = new ObjectRemove(key);
 
         Object value = remove.execute(this.customObject);
 
         try {
-            executor.writeToFile("INSERT " + " " + customObject.getParent() + " " + database.get(customObject.getParent()).toString());
+            executor.writeToFile("INSERT" + "->" + customObject.getParent() + "->" + database.get(customObject.getParent()).toString());
         } catch (Exception e) {
             e.printStackTrace();
         }

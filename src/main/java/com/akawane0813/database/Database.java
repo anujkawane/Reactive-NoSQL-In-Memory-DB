@@ -19,7 +19,7 @@ public class Database implements Serializable, IDatabase {
     private final int BACKUP_INTERVAL_SECONDS = 5;
 
     long END_TIME = System.currentTimeMillis() + BACKUP_INTERVAL_SECONDS * 1000;
-    private CursorMapper cursorMapper = CursorMapper.CursorMapper();
+    private final CursorMapper cursorMapper = CursorMapper.CursorMapper();
 
     @Override
     public String toString() {
@@ -170,7 +170,6 @@ public class Database implements Serializable, IDatabase {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        // CODE TO RE-EXECUTE COMMANDS FROM commands FILE INTO EXISTING OBJECT
     }
 
     public void clear(){
@@ -189,7 +188,6 @@ public class Database implements Serializable, IDatabase {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        // CODE TO RE-EXECUTE COMMANDS FROM commands FILE INTO EXISTING OBJECT
     }
 
     public boolean contains(String key) {

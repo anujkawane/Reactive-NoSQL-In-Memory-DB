@@ -55,7 +55,6 @@ public class Cursor {
 
     public boolean addObserver(IObserver observer) {
         observers.add(observer);
-
         return true;
     }
 

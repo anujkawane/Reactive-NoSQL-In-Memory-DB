@@ -7,10 +7,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CustomObject implements Serializable, ICustomObject {
 
@@ -172,6 +169,18 @@ public class CustomObject implements Serializable, ICustomObject {
 
     public List<String> keys() {
         return new ArrayList<>(map.keySet());
+    }
 
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        CustomObject that = (CustomObject) object;
+        return map.equals(that.map);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(map);
     }
 }

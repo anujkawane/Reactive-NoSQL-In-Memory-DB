@@ -6,10 +6,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Array implements Serializable, IArray{
 
@@ -133,7 +130,7 @@ public class Array implements Serializable, IArray{
         return gson.toJson(arr);
     }
 
-    public Object clone() throws CloneNotSupportedException
+    public Object clone()
     {
         return fromString(toString());
     }
@@ -160,5 +157,18 @@ public class Array implements Serializable, IArray{
             }
         });
         return newArray;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Array array = (Array) object;
+        return objectList.equals(array.objectList);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(objectList);
     }
 }

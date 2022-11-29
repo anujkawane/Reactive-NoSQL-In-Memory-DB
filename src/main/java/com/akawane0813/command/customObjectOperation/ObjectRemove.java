@@ -6,12 +6,12 @@ import com.akawane0813.exception.KeyNotFoundException;
 
 import java.io.Serializable;
 
-public class RemoveOperationDBObject implements IDatabaseOperation, Serializable {
+public class ObjectRemove implements IDatabaseOperation, Serializable {
     private CustomObject customObject;
     private String key;
     private Object removedValue;
 
-    public RemoveOperationDBObject(String key) {
+    public ObjectRemove(String key) {
         this.key = key;
     }
 
@@ -24,7 +24,5 @@ public class RemoveOperationDBObject implements IDatabaseOperation, Serializable
         return customObject.put(key, removedValue);
     }
 
-    public String toString() {
-        return this.operationToString("REMOVE", customObject, removedValue);
-    }
+
 }

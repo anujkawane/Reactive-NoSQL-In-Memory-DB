@@ -5,12 +5,12 @@ import com.akawane0813.database.Array;
 
 import java.io.Serializable;
 
-public class PutOperationArray implements IDatabaseOperation, Serializable {
+public class ArrayPut implements IDatabaseOperation, Serializable {
     private Object value;
     private Array array;
     private int index;
 
-    public PutOperationArray(Object value) {
+    public ArrayPut(Object value) {
         this.value = value;
     }
 
@@ -24,8 +24,5 @@ public class PutOperationArray implements IDatabaseOperation, Serializable {
         return array.remove(index);
     }
 
-    public String toString() {
-        return operationToString("PUT", array, value);
-    }
 
 }

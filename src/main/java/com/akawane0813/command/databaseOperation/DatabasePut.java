@@ -6,13 +6,13 @@ import com.akawane0813.exception.KeyNotFoundException;
 
 import java.io.Serializable;
 
-public class PutOperationDatabase implements IDatabaseOperation, Serializable {
+public class DatabasePut implements IDatabaseOperation, Serializable {
 
     private final Object object;
     private Database db;
     private String key;
 
-    public PutOperationDatabase(String key, Object object) {
+    public DatabasePut(String key, Object object) {
         this.key = key;
         this.object = object;
     }
@@ -25,10 +25,6 @@ public class PutOperationDatabase implements IDatabaseOperation, Serializable {
 
     public Object undo() throws KeyNotFoundException {
         return db.remove(key);
-    }
-
-    public String toString() {
-        return operationToString("PUT", db, object);
     }
 
 }

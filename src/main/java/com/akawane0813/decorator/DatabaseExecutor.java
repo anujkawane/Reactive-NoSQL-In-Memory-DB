@@ -1,18 +1,16 @@
 package com.akawane0813.decorator;
 
 import com.akawane0813.command.IDatabaseOperation;
-import com.akawane0813.command.databaseOperation.PutOperationDatabase;
-import com.akawane0813.command.databaseOperation.RemoveOperationDatabase;
+import com.akawane0813.command.databaseOperation.DatabasePut;
+import com.akawane0813.command.databaseOperation.DatabaseRemove;
 import com.akawane0813.cursor.Cursor;
 import com.akawane0813.database.*;
 import com.akawane0813.exception.KeyNotFoundException;
 import com.akawane0813.transaction.Transaction;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
-import java.util.stream.Collectors;
 
 public class DatabaseExecutor implements IDatabase {
 
@@ -21,6 +19,7 @@ public class DatabaseExecutor implements IDatabase {
 
     private File commandFile;
     private  Executor executor;
+    private List<String> commandStrings;
 
     public DatabaseExecutor(Database db) {
         this.db = db;
@@ -37,6 +36,7 @@ public class DatabaseExecutor implements IDatabase {
     public DatabaseExecutor(Database db, Stack<IDatabaseOperation> operations) {
         this.db = db;
         this.stack = operations;
+        commandStrings = new Stack<>();
     }
 
 
@@ -85,16 +85,17 @@ public class DatabaseExecutor implements IDatabase {
     }
 
     public boolean put(String key, Object value) throws Exception {
-        IDatabaseOperation put = new PutOperationDatabase(key,value);
+        IDatabaseOperation put = new DatabasePut(key,value);
 
         put.execute(this.db);
 
         insertSuperKeyInEveryChild(key, value);
+        String commandString = "INSERT->" + key + "->" + db.get(key).toString();
         if (stack == null) {
-            executor.writeToFile( "INSERT " + key + " " + db.get(key).toString());
+            executor.writeToFile(commandString);
         } else {
             this.stack.add(put);
-
+            commandStrings.add(commandString);
         }
 
         return true;
@@ -123,26 +124,24 @@ public class DatabaseExecutor implements IDatabase {
     }
 
     public IArray getArray(String key) throws Exception {
-        return new ArrayExecuter(this.db.getArray(key));
+        return new ArrayExecutor(this.db.getArray(key));
     }
 
     public ICustomObject getObject(String key) throws Exception {
-        return new DBObjectExecutor(db.getObject(key));
+        return new ObjectExecutor(db.getObject(key));
     }
 
     public Object remove(String key) throws KeyNotFoundException {
-        IDatabaseOperation remove = new RemoveOperationDatabase(key);
+        IDatabaseOperation remove = new DatabaseRemove(key);
 
         Object value = remove.execute(this.db);
+        String commandString = "INSERT->" + key +  "->" + "NO-VALUE";
 
         if (stack == null) {
-            try {
-                executor.writeToFile("INSERT " + key +  " " + db.get(key).toString());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            executor.writeToFile(commandString);
         } else {
             this.stack.add(remove);
+            commandStrings.add(commandString);
 
         }
         return value;
@@ -165,8 +164,8 @@ public class DatabaseExecutor implements IDatabase {
     }
 
     public void commitCommands() {
-        this.stack.forEach((operation) -> {
-            executor.writeToFile(operation.toString());
+        this.commandStrings.forEach((operation) -> {
+            executor.writeToFile(operation);
         });
         snapshot();
     }

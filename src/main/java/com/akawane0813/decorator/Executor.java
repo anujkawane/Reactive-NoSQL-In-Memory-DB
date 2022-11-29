@@ -1,11 +1,9 @@
 package com.akawane0813.decorator;
 
 import com.akawane0813.command.IDatabaseOperation;
-import com.akawane0813.cursor.CursorMapper;
 import com.akawane0813.database.Database;
 import com.akawane0813.fileio.FileOperations;
 
-import javax.xml.crypto.Data;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -58,7 +56,7 @@ public class Executor {
             List<String> operations = fileOperation.readCommandsFromFile(file);
             for (String operation : operations) {
                 if(operation.length()>0) {
-                    String[] res = operation.split(" ");
+                    String[] res = operation.split("->");
                     List<String> resp = Arrays.stream(res).collect(Collectors.toList());
                     commands.add(resp);
                 }
@@ -70,11 +68,11 @@ public class Executor {
         fileOperation.clearFile(file);
         return commands;
     }
-    public void writeToFile( String operation) {
+
+    public void writeToFile(String operation) {
         if (commandFile == null) {
             commandFile = new File("src/main/resources/commands.txt");
         }
-
         fileOperation.writeCommandsToFile(commandFile,operation);
     }
 }

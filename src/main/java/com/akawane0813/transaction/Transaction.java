@@ -12,14 +12,14 @@ import java.util.Stack;
 
 public class Transaction implements IDatabase {
 
-    private Database db;
+    private Database database;
     private DatabaseExecutor databaseExecutor;
 
     private Boolean isActive = true;
     Stack<IDatabaseOperation> operations = new Stack<>();
-    public Transaction(Database db){
-        this.db = db;
-        databaseExecutor = new DatabaseExecutor(this.db,operations);
+    public Transaction(Database database){
+        this.database = database;
+        databaseExecutor = new DatabaseExecutor(this.database,operations);
     }
     public boolean put(String key, Object value) throws KeyNotFoundException {
         boolean response = false;
@@ -32,37 +32,37 @@ public class Transaction implements IDatabase {
     }
 
     public int getInt(String key) throws Exception {
-        return this.db.getInt(key);
+        return database.getInt(key);
     }
 
     public String getString(String key) throws Exception {
-        return this.db.getString(key);
+        return database.getString(key);
     }
 
     public Array getArray(String key) throws Exception {
-        return this.db.getArray(key);
+        return database.getArray(key);
     }
 
     public CustomObject getObject(String key) throws Exception {
-        return this.db.getObject(key);
+        return database.getObject(key);
     }
 
 
     public Object get(String key) throws Exception {
-        return this.db.get(key);
+        return database.get(key);
     }
 
     public Object remove(String key) throws KeyNotFoundException {
-        return this.databaseExecutor.remove(key);
+        return databaseExecutor.remove(key);
     }
 
     public boolean abort() throws KeyNotFoundException {
-        this.operations = this.databaseExecutor.getCommands();
-        while(!this.operations.isEmpty()) {
-            IDatabaseOperation operation = this.operations.pop();
+        operations = databaseExecutor.getCommands();
+        while(!operations.isEmpty()) {
+            IDatabaseOperation operation = operations.pop();
             operation.undo();
         }
-        this.isActive = false;
+        isActive = false;
 
         databaseExecutor.snapshot();
         return true;
@@ -70,7 +70,7 @@ public class Transaction implements IDatabase {
 
     public boolean commit() {
         databaseExecutor.commitCommands();
-        this.isActive = false;
+        isActive = false;
         return true;
     }
 

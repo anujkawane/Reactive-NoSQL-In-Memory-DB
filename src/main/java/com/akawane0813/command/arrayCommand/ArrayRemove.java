@@ -6,12 +6,12 @@ import com.akawane0813.database.Array;
 
 import java.io.Serializable;
 
-public class RemoveOperationArray implements IDatabaseOperation, Serializable {
+public class ArrayRemove implements IDatabaseOperation, Serializable {
     private int index;
     private Array array;
     private Object removedValue;
 
-    public RemoveOperationArray(int index) {
+    public ArrayRemove(int index) {
         this.index = index;
     }
 
@@ -25,7 +25,4 @@ public class RemoveOperationArray implements IDatabaseOperation, Serializable {
         return array.put(removedValue);
     }
 
-    public String toString() {
-        return operationToString("REMOVE", array, removedValue);
-    }
 }

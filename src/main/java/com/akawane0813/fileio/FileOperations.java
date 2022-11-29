@@ -5,12 +5,12 @@ import java.util.*;
 
 public class FileOperations {
 
-    final String FILEPATH_TO_STORE_OBJECT_STATE = "src/main/resources/dbSnapshot.txt";
-    final String FILEPATH_TO_STORE_COMMANDS = "src/main/resources/commands.txt";
-    FileInputStream fileInputStream;
-    FileOutputStream fileOutputStream;
-    ObjectOutputStream objectOutputStream;
-    ObjectInputStream objectInputStream;
+    private final String FILEPATH_TO_STORE_OBJECT_STATE = "src/main/resources/dbSnapshot.txt";
+    private final String FILEPATH_TO_STORE_COMMANDS = "src/main/resources/commands.txt";
+    private FileInputStream fileInputStream;
+    private FileOutputStream fileOutputStream;
+    private ObjectOutputStream objectOutputStream;
+    private ObjectInputStream objectInputStream;
 
     public boolean writeObjectToFile(File file, Object serObj) {
         try {
@@ -48,7 +48,7 @@ public class FileOperations {
 
     public List<String> readCommandsFromFile(File file) throws IOException {
         List<String> result = new ArrayList<>();
-        Scanner scanner = null;
+        Scanner scanner;
         try {
             fileInputStream = new FileInputStream(file);
             scanner = new Scanner(fileInputStream, "UTF-8");
@@ -60,9 +60,7 @@ public class FileOperations {
             if (fileInputStream != null) {
                 fileInputStream.close();
             }
-            if (scanner != null) {
-                scanner.close();
-            }
+            scanner.close();
         } catch (Exception e){
             return new ArrayList<>();
         }
