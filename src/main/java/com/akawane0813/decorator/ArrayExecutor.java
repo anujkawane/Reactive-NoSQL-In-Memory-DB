@@ -1,13 +1,11 @@
 package com.akawane0813.decorator;
 
-
 import com.akawane0813.command.IDatabaseOperation;
 import com.akawane0813.command.arrayCommand.ArrayPut;
 import com.akawane0813.command.arrayCommand.ArrayRemove;
 import com.akawane0813.database.*;
 import com.akawane0813.exception.IncompatibleTypeException;
 import com.akawane0813.exception.KeyNotFoundException;
-
 
 public class ArrayExecutor implements IArray {
     private Array array;
@@ -44,6 +42,11 @@ public class ArrayExecutor implements IArray {
         return this.array.getInt(index);
     }
 
+    @Override
+    public Double getDouble(int index) throws IncompatibleTypeException {
+        return this.array.getDouble(index);
+    }
+
     public String getString(int index) throws IncompatibleTypeException {
         return this.array.getString(index);
     }
@@ -65,7 +68,7 @@ public class ArrayExecutor implements IArray {
 
         Object value = remove.execute(this.array);
 
-        executor.writeToFile(  "INSERT->" + array.getParent() + "->" + db.get(array.getParent()).toString() );
+        executor.writeToFile(  "INSERT->" + array.getParent() + "->" + db.get(array.getParent()).toString());
         return value;
     }
 }

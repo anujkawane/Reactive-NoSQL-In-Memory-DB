@@ -59,6 +59,13 @@ public class CustomObject implements Serializable, ICustomObject {
         throw new IncompatibleTypeException("CustomObject at key "+key+" is not of type Integer");
     }
 
+    public Double getDouble(String key) throws IncompatibleTypeException {
+        if(map.get(key) instanceof Double){
+            return (Double) map.get(key);
+        }
+        throw new IncompatibleTypeException("CustomObject at key "+key+" is not of type Double");
+    }
+
     public CustomObject getObject(String key) throws IncompatibleTypeException {
         if(map.get(key) instanceof CustomObject){
             return (CustomObject) map.get(key);
@@ -118,6 +125,7 @@ public class CustomObject implements Serializable, ICustomObject {
         });
         return map;
     }
+
 
     public String toString(){
         HashMap<String, Object> map = convertToHashMap(this);

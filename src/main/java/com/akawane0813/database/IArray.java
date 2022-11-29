@@ -13,6 +13,8 @@ public interface IArray {
 
     int getInt(int index) throws IncompatibleTypeException;
 
+    Double getDouble(int index) throws IncompatibleTypeException;
+
     IArray getArray(int index) throws IncompatibleTypeException;
 
     ICustomObject getObject(int index) throws IncompatibleTypeException;

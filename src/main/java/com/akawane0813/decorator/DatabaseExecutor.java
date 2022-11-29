@@ -14,7 +14,7 @@ import java.util.Stack;
 
 public class DatabaseExecutor implements IDatabase {
 
-    private Database db;
+    private Database database;
     private Stack<IDatabaseOperation> stack ;
 
     private File commandFile;
@@ -22,19 +22,19 @@ public class DatabaseExecutor implements IDatabase {
     private List<String> commandStrings;
 
     public DatabaseExecutor(Database db) {
-        this.db = db;
+        this.database = db;
         executor = Executor.Executor(db,new File("commands.txt"));
 
     }
 
     public DatabaseExecutor(Database db, File commandFile) {
         executor = Executor.Executor(db,commandFile);
-        this.db = db;
+        this.database = db;
         this.commandFile = commandFile;
     }
 
     public DatabaseExecutor(Database db, Stack<IDatabaseOperation> operations) {
-        this.db = db;
+        this.database = db;
         this.stack = operations;
         commandStrings = new Stack<>();
     }
@@ -57,8 +57,8 @@ public class DatabaseExecutor implements IDatabase {
         String key = operations.get(1);
         String value = operations.get(2);
 
-        if (db.contains(key)) {
-            db.remove(key);
+        if (database.contains(key)) {
+            database.remove(key);
             put(key,parseValue(value));
         } else {
             put(key,parseValue(value));
@@ -81,16 +81,16 @@ public class DatabaseExecutor implements IDatabase {
     }
 
     public String toString() {
-        return this.db.toString();
+        return this.database.toString();
     }
 
     public boolean put(String key, Object value) throws Exception {
         IDatabaseOperation put = new DatabasePut(key,value);
 
-        put.execute(this.db);
+        put.execute(this.database);
 
         insertSuperKeyInEveryChild(key, value);
-        String commandString = "INSERT->" + key + "->" + db.get(key).toString();
+        String commandString = "INSERT->" + key + "->" + database.get(key).toString();
         if (stack == null) {
             executor.writeToFile(commandString);
         } else {
@@ -112,29 +112,29 @@ public class DatabaseExecutor implements IDatabase {
 
 
     public Object get(String key) throws Exception {
-        return this.db.get(key);
+        return this.database.get(key);
     }
 
     public int getInt(String key) throws Exception {
-        return this.db.getInt(key);
+        return this.database.getInt(key);
     }
 
     public String getString(String key) throws Exception {
-        return this.db.getString(key);
+        return this.database.getString(key);
     }
 
     public IArray getArray(String key) throws Exception {
-        return new ArrayExecutor(this.db.getArray(key));
+        return new ArrayExecutor(this.database.getArray(key));
     }
 
     public ICustomObject getObject(String key) throws Exception {
-        return new ObjectExecutor(db.getObject(key));
+        return new ObjectExecutor(database.getObject(key));
     }
 
     public Object remove(String key) throws KeyNotFoundException {
         IDatabaseOperation remove = new DatabaseRemove(key);
 
-        Object value = remove.execute(this.db);
+        Object value = remove.execute(this.database);
         String commandString = "INSERT->" + key +  "->" + "NO-VALUE";
 
         if (stack == null) {
@@ -148,7 +148,7 @@ public class DatabaseExecutor implements IDatabase {
     }
 
     public Cursor getCursor(String key) {
-        return this.db.getCursor(key);
+        return this.database.getCursor(key);
     }
 
     public Stack<IDatabaseOperation> getCommands() {
@@ -160,7 +160,7 @@ public class DatabaseExecutor implements IDatabase {
     }
 
     public Transaction transaction() {
-        return this.db.transaction();
+        return this.database.transaction();
     }
 
     public void commitCommands() {
@@ -171,7 +171,7 @@ public class DatabaseExecutor implements IDatabase {
     }
 
     public void snapshot() {
-        db.snapshot();
+        database.snapshot();
     }
 
 }

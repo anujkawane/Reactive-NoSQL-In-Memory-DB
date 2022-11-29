@@ -69,6 +69,16 @@ public class Array implements Serializable, IArray{
         throw new IncompatibleTypeException("CustomObject at index "+index+" is not of type Integer");
     }
 
+    public Double getDouble(int index) throws IncompatibleTypeException {
+        if(index > objectList.size()){
+            throw new IndexOutOfBoundsException();
+        }
+        if(objectList.get(index) instanceof Double){
+            return (Double) objectList.get(index);
+        }
+        throw new IncompatibleTypeException("CustomObject at index "+index+" is not of type Double");
+    }
+
     public ICustomObject getObject(int index) throws IncompatibleTypeException {
         if(index > objectList.size()){
             throw new IndexOutOfBoundsException();

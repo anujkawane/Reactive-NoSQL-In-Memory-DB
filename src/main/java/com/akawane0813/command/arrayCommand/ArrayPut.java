@@ -24,5 +24,4 @@ public class ArrayPut implements IDatabaseOperation, Serializable {
         return array.remove(index);
     }
 
-
 }

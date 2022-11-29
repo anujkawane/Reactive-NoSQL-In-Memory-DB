@@ -22,7 +22,7 @@ public class DataStore implements Serializable {
 
     @Override
     public String toString() {
-        return "Database"
+        return "database"
                 + database +
                 "";
     }

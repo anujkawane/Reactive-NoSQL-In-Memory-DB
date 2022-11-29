@@ -79,6 +79,17 @@ public class Database implements Serializable, IDatabase {
         throw new IncompatibleTypeException("CustomObject at key "+key+" is not of type Integer");
     }
 
+    public Double getDouble(String key) throws Exception {
+        if(!database.containsKey(key)) {
+            throw new KeyNotFoundException("No such key as " + key);
+        }
+
+        if(database.get(key) instanceof Double){
+            return (Double) database.get(key);
+        }
+        throw new IncompatibleTypeException("CustomObject at key "+key+" is not of type Double");
+    }
+
     public Array getArray(String key) throws Exception {
         if(!database.containsKey(key)) {
             throw new KeyNotFoundException("No such key as " + key);
