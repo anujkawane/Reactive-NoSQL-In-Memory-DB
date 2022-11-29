@@ -177,7 +177,7 @@ public class Database implements Serializable, IDatabase {
             database = restoredDB;
         }
         try {
-            new DatabaseExecutor(this).executeSavedOperations(new File("src/main/resources/commands.txt"));
+            new DatabaseExecutor(this).executeSavedCommands(new File(COMMANDS_FILEPATH));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -195,7 +195,7 @@ public class Database implements Serializable, IDatabase {
             database = restoredDB;
         }
         try {
-            new DatabaseExecutor(this).executeSavedOperations(commands);
+            new DatabaseExecutor(this).executeSavedCommands(commands);
         } catch (Exception e) {
             e.printStackTrace();
         }

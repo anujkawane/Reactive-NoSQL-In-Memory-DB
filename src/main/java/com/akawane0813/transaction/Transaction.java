@@ -1,6 +1,6 @@
 package com.akawane0813.transaction;
 
-import com.akawane0813.command.IDatabaseOperation;
+import com.akawane0813.command.IDatabaseCommands;
 import com.akawane0813.database.Array;
 import com.akawane0813.database.CustomObject;
 import com.akawane0813.database.Database;
@@ -16,7 +16,7 @@ public class Transaction implements IDatabase {
     private DatabaseExecutor databaseExecutor;
 
     private Boolean isActive = true;
-    Stack<IDatabaseOperation> operations = new Stack<>();
+    Stack<IDatabaseCommands> operations = new Stack<>();
     public Transaction(Database database){
         this.database = database;
         databaseExecutor = new DatabaseExecutor(this.database,operations);
@@ -63,7 +63,7 @@ public class Transaction implements IDatabase {
     public boolean abort() throws KeyNotFoundException {
         operations = databaseExecutor.getCommands();
         while(!operations.isEmpty()) {
-            IDatabaseOperation operation = operations.pop();
+            IDatabaseCommands operation = operations.pop();
             operation.undo();
         }
         isActive = false;

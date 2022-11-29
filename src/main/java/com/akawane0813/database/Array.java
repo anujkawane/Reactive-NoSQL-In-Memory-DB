@@ -1,6 +1,9 @@
 package com.akawane0813.database;
 
 import com.akawane0813.exception.IncompatibleTypeException;
+import com.akawane0813.exception.KeyNotFoundException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -144,32 +147,57 @@ public class Array implements Serializable, IArray{
 
     public Object clone()
     {
-        return fromString(toString());
+        try {
+            return fromString(toString());
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public int size(){
         return objectList.size();
     }
 
-    public Array fromString(String value) {
-        Array newArray = new Array();
-        Type expectedType = new TypeToken<ArrayList<Object>>(){}.getType();
-        ArrayList object = gson.fromJson(value, expectedType);
-        object.forEach((v)
-                -> {
-            if (v instanceof ArrayList) {
-                Array a = this.fromString(v.toString());
-                newArray.put(a);
-            }else if (v instanceof Map) {
-                CustomObject db = new CustomObject();
-                CustomObject a = db.fromString(v.toString());
-                newArray.put(a);
-            } else {
-                newArray.put(v);
+    public Array fromString(String str) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        List<Object> list = mapper.readValue(str, ArrayList.class);
+        Array arrayObjects = new Array();
+
+        for (Object obj : list) {
+            if(obj instanceof ArrayList){
+                String jsonArrString = mapper.writeValueAsString(obj);
+                Array currArrayObj = this.fromString(jsonArrString);
+                arrayObjects.put(currArrayObj);
+            } else if (obj instanceof HashMap) {
+                String jsonObjString = mapper.writeValueAsString(obj);
+                arrayObjects.put(new CustomObject().fromString(jsonObjString));
+            }else{
+                arrayObjects.put(obj);
             }
-        });
-        return newArray;
+        }
+        return arrayObjects;
     }
+
+//    public Array fromString(String value) {
+//        Array newArray = new Array();
+//        Type expectedType = new TypeToken<ArrayList<Object>>(){}.getType();
+//        ArrayList object = gson.fromJson(value, expectedType);
+//        object.forEach((v)
+//                -> {
+//            if (v instanceof ArrayList) {
+//                Array a = this.fromString(v.toString());
+//                newArray.put(a);
+//            }else if (v instanceof Map) {
+//                CustomObject db = new CustomObject();
+//                CustomObject a = db.fromString(v.toString());
+//                newArray.put(a);
+//            } else {
+//                newArray.put(v);
+//            }
+//        });
+//        return newArray;
+//    }
 
     @Override
     public boolean equals(Object object) {

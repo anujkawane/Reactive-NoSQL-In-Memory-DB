@@ -1,12 +1,12 @@
-package com.akawane0813.command.arrayCommand;
+package com.akawane0813.command.arrayCommands;
 
-import com.akawane0813.command.IDatabaseOperation;
+import com.akawane0813.command.IDatabaseCommands;
 import com.akawane0813.database.Array;
 
 
 import java.io.Serializable;
 
-public class ArrayRemove implements IDatabaseOperation, Serializable {
+public class ArrayRemove implements IDatabaseCommands, Serializable {
     private int index;
     private Array array;
     private Object removedValue;

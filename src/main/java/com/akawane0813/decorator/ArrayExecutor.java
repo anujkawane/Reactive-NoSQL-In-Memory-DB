@@ -1,8 +1,8 @@
 package com.akawane0813.decorator;
 
-import com.akawane0813.command.IDatabaseOperation;
-import com.akawane0813.command.arrayCommand.ArrayPut;
-import com.akawane0813.command.arrayCommand.ArrayRemove;
+import com.akawane0813.command.IDatabaseCommands;
+import com.akawane0813.command.arrayCommands.ArrayPut;
+import com.akawane0813.command.arrayCommands.ArrayRemove;
 import com.akawane0813.database.*;
 import com.akawane0813.exception.IncompatibleTypeException;
 import com.akawane0813.exception.KeyNotFoundException;
@@ -21,12 +21,12 @@ public class ArrayExecutor implements IArray {
     }
 
     public boolean put(Object value) throws KeyNotFoundException {
-        IDatabaseOperation put = new ArrayPut(value);
+        IDatabaseCommands put = new ArrayPut(value);
 
         Boolean response = (boolean)put.execute(this.array);
 
         try {
-            executor.writeToFile( "INSERT->" + array.getParent() + "->" +db.get(array.getParent()).toString());
+            executor.writeToFile( "PUT->" + array.getParent() + "->" +db.get(array.getParent()).toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -64,11 +64,11 @@ public class ArrayExecutor implements IArray {
     }
 
     public Object remove(int index) throws Exception {
-        IDatabaseOperation remove = new ArrayRemove(index);
+        IDatabaseCommands remove = new ArrayRemove(index);
 
         Object value = remove.execute(this.array);
 
-        executor.writeToFile(  "INSERT->" + array.getParent() + "->" + db.get(array.getParent()).toString());
+        executor.writeToFile(  "PUT->" + array.getParent() + "->" + db.get(array.getParent()).toString());
         return value;
     }
 }

@@ -1,6 +1,6 @@
 package com.akawane0813.decorator;
 
-import com.akawane0813.command.IDatabaseOperation;
+import com.akawane0813.command.IDatabaseCommands;
 import com.akawane0813.database.Database;
 import com.akawane0813.fileio.FileOperations;
 
@@ -13,7 +13,10 @@ import java.util.Stack;
 import java.util.stream.Collectors;
 
 public class Executor {
-    private Stack<IDatabaseOperation> operationList;
+
+    private final String DATABASE_MEMENTO_FILEPATH = "src/main/resources/dbSnapshot.txt";
+    private final String COMMANDS_FILEPATH = "src/main/resources/commands.txt";
+    private Stack<IDatabaseCommands> operationList;
     private Database db;
     private DatabaseExecutor databaseExecutor;
     private FileOperations fileOperation;
@@ -71,7 +74,7 @@ public class Executor {
 
     public void writeToFile(String operation) {
         if (commandFile == null) {
-            commandFile = new File("src/main/resources/commands.txt");
+            commandFile = new File(COMMANDS_FILEPATH);
         }
         fileOperation.writeCommandsToFile(commandFile,operation);
     }

@@ -1,12 +1,12 @@
-package com.akawane0813.command.databaseOperation;
+package com.akawane0813.command.databaseCommands;
 
-import com.akawane0813.command.IDatabaseOperation;
+import com.akawane0813.command.IDatabaseCommands;
 import com.akawane0813.database.Database;
 import com.akawane0813.exception.KeyNotFoundException;
 
 import java.io.Serializable;
 
-public class DatabaseRemove implements IDatabaseOperation, Serializable {
+public class DatabaseRemove implements IDatabaseCommands, Serializable {
     private Database db;
     private String key;
     private Object removedValue;

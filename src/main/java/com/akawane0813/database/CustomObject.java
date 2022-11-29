@@ -2,6 +2,8 @@ package com.akawane0813.database;
 
 import com.akawane0813.exception.KeyNotFoundException;
 import com.akawane0813.exception.IncompatibleTypeException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -138,38 +140,69 @@ public class CustomObject implements Serializable, ICustomObject {
         return fromString(toString());
     }
 
-    public CustomObject fromString(String value) {
-        Type userListType = new TypeToken<HashMap<String,Object>>(){}.getType();
-        HashMap object = gson.fromJson(value, userListType);
+    public CustomObject fromString(String stringValue) {
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> parsedJson;
+        try {
+            parsedJson = mapper.readValue(stringValue, HashMap.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         CustomObject newCustomObject = new CustomObject();
-        this.map = object;
 
-        object.forEach((k, v)
-                -> {
-            if (v instanceof ArrayList) {
-                Array array = new Array().fromString(v.toString());
-                try {
-                    newCustomObject.put(k.toString(),array);
-                } catch (KeyNotFoundException e) {
-                    e.printStackTrace();
+        for (Map.Entry<String, Object> entry : parsedJson.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            try {
+                if (value instanceof ArrayList) {
+                    String json = null;
+                    json = mapper.writeValueAsString(value);
+                    newCustomObject.put(key, new Array().fromString(json));
+                } else if (value instanceof Map) {
+                    String json = mapper.writeValueAsString(value);
+                    newCustomObject.put(key, this.fromString(json));
+                } else {
+                    newCustomObject.put(key, value);
                 }
-            }else if (v instanceof Map) {
-                CustomObject customObject = fromString(v.toString());
-                try {
-                    newCustomObject.put(k.toString(),customObject);
-                } catch (KeyNotFoundException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                try {
-                    newCustomObject.put(k.toString(),v);
-                } catch (KeyNotFoundException e) {
-                    e.printStackTrace();
-                }
+            }catch (Exception ex){
+                ex.printStackTrace();
             }
-        });
+        }
+
         return newCustomObject;
     }
+//    public CustomObject fromString(String value) {
+//        Type userListType = new TypeToken<HashMap<String,Object>>(){}.getType();
+//        HashMap object = gson.fromJson(value, userListType);
+//        CustomObject newCustomObject = new CustomObject();
+//        this.map = object;
+//
+//        object.forEach((k, v)
+//                -> {
+//            if (v instanceof ArrayList) {
+//                Array array = new Array().fromString(v.toString());
+//                try {
+//                    newCustomObject.put(k.toString(),array);
+//                } catch (KeyNotFoundException e) {
+//                    e.printStackTrace();
+//                }
+//            }else if (v instanceof Map) {
+//                CustomObject customObject = fromString(v.toString());
+//                try {
+//                    newCustomObject.put(k.toString(),customObject);
+//                } catch (KeyNotFoundException e) {
+//                    e.printStackTrace();
+//                }
+//            } else {
+//                try {
+//                    newCustomObject.put(k.toString(),v);
+//                } catch (KeyNotFoundException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//        return newCustomObject;
+//    }
 
     public int size(){
         return map.size();

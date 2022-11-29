@@ -1,11 +1,11 @@
-package com.akawane0813.command.arrayCommand;
+package com.akawane0813.command.arrayCommands;
 
-import com.akawane0813.command.IDatabaseOperation;
+import com.akawane0813.command.IDatabaseCommands;
 import com.akawane0813.database.Array;
 
 import java.io.Serializable;
 
-public class ArrayPut implements IDatabaseOperation, Serializable {
+public class ArrayPut implements IDatabaseCommands, Serializable {
     private Object value;
     private Array array;
     private int index;

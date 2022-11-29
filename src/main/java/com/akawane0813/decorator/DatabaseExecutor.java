@@ -1,12 +1,13 @@
 package com.akawane0813.decorator;
 
-import com.akawane0813.command.IDatabaseOperation;
-import com.akawane0813.command.databaseOperation.DatabasePut;
-import com.akawane0813.command.databaseOperation.DatabaseRemove;
+import com.akawane0813.command.IDatabaseCommands;
+import com.akawane0813.command.databaseCommands.DatabasePut;
+import com.akawane0813.command.databaseCommands.DatabaseRemove;
 import com.akawane0813.cursor.Cursor;
 import com.akawane0813.database.*;
 import com.akawane0813.exception.KeyNotFoundException;
 import com.akawane0813.transaction.Transaction;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.io.File;
 import java.util.List;
@@ -14,8 +15,11 @@ import java.util.Stack;
 
 public class DatabaseExecutor implements IDatabase {
 
+    private final String DATABASE_MEMENTO_FILEPATH = "src/main/resources/dbSnapshot.txt";
+    private final String COMMANDS_FILEPATH = "src/main/resources/commands.txt";
+
     private Database database;
-    private Stack<IDatabaseOperation> stack ;
+    private Stack<IDatabaseCommands> stack ;
 
     private File commandFile;
     private  Executor executor;
@@ -23,7 +27,7 @@ public class DatabaseExecutor implements IDatabase {
 
     public DatabaseExecutor(Database db) {
         this.database = db;
-        executor = Executor.getInstance(db,new File("commands.txt"));
+        executor = Executor.getInstance(db,new File(COMMANDS_FILEPATH));
 
     }
 
@@ -33,29 +37,27 @@ public class DatabaseExecutor implements IDatabase {
         this.commandFile = commandFile;
     }
 
-    public DatabaseExecutor(Database db, Stack<IDatabaseOperation> operations) {
+    public DatabaseExecutor(Database db, Stack<IDatabaseCommands> operations) {
         this.database = db;
         this.stack = operations;
         commandStrings = new Stack<>();
     }
 
-
-
-    public void executeSavedOperations(File commandFile) throws Exception {
-        List<List<String>> operations;
+    public void executeSavedCommands(File commandFile) throws Exception {
+        List<List<String>> commands;
         if (commandFile == null) {
-            operations = executor.getCommands(new File("src/main/resources/commands.txt"));
+            commands = executor.getCommands(new File(COMMANDS_FILEPATH));
         } else {
-            operations = executor.getCommands(new File("src/main/resources/commands.txt"));
+            commands = executor.getCommands(new File(COMMANDS_FILEPATH));
         }
-        for (List<String> operation : operations) {
-            executeOperation(operation);
+        for (List<String> command : commands) {
+            executeCommands(command);
         }
     }
 
-    public void executeOperation(List<String> operations) throws Exception {
-        String key = operations.get(1);
-        String value = operations.get(2);
+    public void executeCommands(List<String> commands) throws Exception {
+        String key = commands.get(1);
+        String value = commands.get(2);
 
         if (database.contains(key)) {
             database.remove(key);
@@ -65,7 +67,7 @@ public class DatabaseExecutor implements IDatabase {
         }
     }
 
-    public Object parseValue(String value) {
+    public Object parseValue(String value) throws JsonProcessingException {
 
         if (value.charAt(0) == '[') {
             return new Array().fromString(value);
@@ -85,12 +87,12 @@ public class DatabaseExecutor implements IDatabase {
     }
 
     public boolean put(String key, Object value) throws Exception {
-        IDatabaseOperation put = new DatabasePut(key,value);
+        IDatabaseCommands put = new DatabasePut(key,value);
 
         put.execute(this.database);
 
         insertSuperKeyInEveryChild(key, value);
-        String commandString = "INSERT->" + key + "->" + database.get(key).toString();
+        String commandString = "PUT->" + key + "->" + database.get(key).toString();
         if (stack == null) {
             executor.writeToFile(commandString);
         } else {
@@ -136,10 +138,10 @@ public class DatabaseExecutor implements IDatabase {
     }
 
     public Object remove(String key) throws KeyNotFoundException {
-        IDatabaseOperation remove = new DatabaseRemove(key);
+        IDatabaseCommands remove = new DatabaseRemove(key);
 
         Object value = remove.execute(this.database);
-        String commandString = "INSERT->" + key +  "->" + "NO-VALUE";
+        String commandString = "PUT->" + key +  "->" + "NO-VALUE";
 
         if (stack == null) {
             executor.writeToFile(commandString);
@@ -155,7 +157,7 @@ public class DatabaseExecutor implements IDatabase {
         return this.database.getCursor(key);
     }
 
-    public Stack<IDatabaseOperation> getCommands() {
+    public Stack<IDatabaseCommands> getCommands() {
         return stack;
     }
     public boolean clearCommands() {

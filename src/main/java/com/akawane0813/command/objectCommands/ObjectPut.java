@@ -1,12 +1,12 @@
-package com.akawane0813.command.customObjectOperation;
+package com.akawane0813.command.objectCommands;
 
-import com.akawane0813.command.IDatabaseOperation;
+import com.akawane0813.command.IDatabaseCommands;
 import com.akawane0813.database.CustomObject;
 import com.akawane0813.exception.KeyNotFoundException;
 
 import java.io.Serializable;
 
-public class ObjectPut implements IDatabaseOperation, Serializable {
+public class ObjectPut implements IDatabaseCommands, Serializable {
     private Object value;
     private CustomObject customObject;
     private String key;

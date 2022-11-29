@@ -1,8 +1,8 @@
 package com.akawane0813.decorator;
 
-import com.akawane0813.command.IDatabaseOperation;
-import com.akawane0813.command.customObjectOperation.ObjectPut;
-import com.akawane0813.command.customObjectOperation.ObjectRemove;
+import com.akawane0813.command.IDatabaseCommands;
+import com.akawane0813.command.objectCommands.ObjectPut;
+import com.akawane0813.command.objectCommands.ObjectRemove;
 import com.akawane0813.database.*;
 import com.akawane0813.exception.IncompatibleTypeException;
 import com.akawane0813.exception.KeyNotFoundException;
@@ -23,7 +23,7 @@ public class ObjectExecutor implements ICustomObject {
     }
 
     public boolean put(String key, Object value) throws KeyNotFoundException {
-        IDatabaseOperation put = new ObjectPut(key,value);
+        IDatabaseCommands put = new ObjectPut(key,value);
 
         Boolean res = (boolean)put.execute(this.customObject);
 
@@ -35,7 +35,7 @@ public class ObjectExecutor implements ICustomObject {
             newValue = null;
         }
 
-        executor.writeToFile( "INSERT->" + customObject.getParent() + "->" +newValue.toString() );
+        executor.writeToFile( "PUT->" + customObject.getParent() + "->" +newValue.toString() );
 
         return res;
     }
@@ -62,12 +62,12 @@ public class ObjectExecutor implements ICustomObject {
     }
 
     public Object remove(String key) throws KeyNotFoundException {
-        IDatabaseOperation remove = new ObjectRemove(key);
+        IDatabaseCommands remove = new ObjectRemove(key);
 
         Object value = remove.execute(this.customObject);
 
         try {
-            executor.writeToFile("INSERT" + "->" + customObject.getParent() + "->" + database.get(customObject.getParent()).toString());
+            executor.writeToFile("PUT" + "->" + customObject.getParent() + "->" + database.get(customObject.getParent()).toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
