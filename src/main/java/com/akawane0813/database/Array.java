@@ -22,11 +22,6 @@ public class Array implements Serializable, IArray{
         gson = new Gson();
     }
 
-
-//    public void setParent(String parent) {
-//        this.parent = parent;
-//    }
-
     public void setParent(String parent) {
         int index = 0;
         this.parent = parent;

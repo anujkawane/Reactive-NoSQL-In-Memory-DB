@@ -17,10 +17,10 @@ public class FileOperations {
             fileOutputStream = new FileOutputStream(file);
             objectOutputStream = new ObjectOutputStream(fileOutputStream);
             objectOutputStream.writeObject(serObj);
-            objectOutputStream.close();
-            if (fileOutputStream != null) {
+            if(objectInputStream != null)
+                objectOutputStream.close();
+            if (fileOutputStream != null)
                 fileOutputStream.close();
-            }
             return true;
         } catch (Exception ex) {
             return false;

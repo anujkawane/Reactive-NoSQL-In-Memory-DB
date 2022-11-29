@@ -20,7 +20,7 @@ public class Database implements Serializable, IDatabase {
     private final int intervalForBackup = 5;
 
     long END_TIME = System.currentTimeMillis() + 5 * 1000;
-    private CursorMapper cursorMapper;
+    private CursorMapper cursorMapper = CursorMapper.CursorMapper();
 
     @Override
     public String toString() {
@@ -31,15 +31,13 @@ public class Database implements Serializable, IDatabase {
 
     public Database(){
         initializeDatabase();
-        cursorMapper = CursorMapper.CursorMapper();
     }
 
     //load BookList from memento if available
     private void initializeDatabase() {
+        database = new DataStore();
         recover();
-        if(database == null){
-            database = new DataStore();
-        }
+
     }
 
     private void backup() {
