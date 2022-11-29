@@ -1,31 +1,22 @@
 package com.akawane0813.database;
 
 import com.akawane0813.exception.IncompatibleTypeException;
-import com.akawane0813.exception.KeyNotFoundException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
 import java.io.Serializable;
-import java.lang.reflect.Type;
 import java.util.*;
 
 public class Array implements Serializable, IArray{
 
     List objectList;
 
-    transient Gson gson;
-
     private String parent = "";
 
     public Array(){
         objectList = new ArrayList();
-        gson = new Gson();
     }
 
     public void setParent(String parent) {
-        int index = 0;
         this.parent = parent;
         objectList.forEach((v)->{
             if(v instanceof Array) {
@@ -59,7 +50,7 @@ public class Array implements Serializable, IArray{
         if(objectList.get(index) instanceof String){
             return (String) objectList.get(index);
         }
-        throw new IncompatibleTypeException("CustomObject at index "+index+" is not of type String");
+        throw new IncompatibleTypeException("Object at index "+index+" is not of type String");
     }
 
 
@@ -71,7 +62,7 @@ public class Array implements Serializable, IArray{
         if(objectList.get(index) instanceof Integer){
             return (int) objectList.get(index);
         }
-        throw new IncompatibleTypeException("CustomObject at index "+index+" is not of type Integer");
+        throw new IncompatibleTypeException("Object at index "+index+" is not of type Integer");
     }
 
     public Double getDouble(int index) throws IncompatibleTypeException {
@@ -81,7 +72,7 @@ public class Array implements Serializable, IArray{
         if(objectList.get(index) instanceof Double){
             return (Double) objectList.get(index);
         }
-        throw new IncompatibleTypeException("CustomObject at index "+index+" is not of type Double");
+        throw new IncompatibleTypeException("Object at index "+index+" is not of type Double");
     }
 
     public ICustomObject getObject(int index) throws IncompatibleTypeException {
@@ -91,7 +82,7 @@ public class Array implements Serializable, IArray{
         if(objectList.get(index) instanceof CustomObject){
             return (CustomObject) objectList.get(index);
         }
-        throw new IncompatibleTypeException("CustomObject at index "+index+" is not of type CustomObject");
+        throw new IncompatibleTypeException("Object at index "+index+" is not of type CustomObject");
     }
 
     public IArray getArray(int index) throws IncompatibleTypeException {
@@ -101,7 +92,7 @@ public class Array implements Serializable, IArray{
         if(objectList.get(index) instanceof Array){
             return (Array) objectList.get(index);
         }
-        throw new IncompatibleTypeException("CustomObject at index "+index+" is not of type Array");
+        throw new IncompatibleTypeException("Object at index "+index+" is not of type Array");
     }
 
     public Object get(int index){
@@ -114,6 +105,7 @@ public class Array implements Serializable, IArray{
     public int length(){
         return objectList.size();
     }
+
     public Object remove(int index) {
         if(index < objectList.size()) {
             return objectList.remove(index);
@@ -121,28 +113,30 @@ public class Array implements Serializable, IArray{
         throw new IndexOutOfBoundsException();
     }
 
-    public ArrayList<Object> convertToArrayList(Array array) {
-        ArrayList<Object> newArrayList = new ArrayList<>();
-
-        array.objectList.forEach(v -> {
-            if (v instanceof Array) {
-                ArrayList<Object> a = this.convertToArrayList((Array)v);
-                newArrayList.add(a);
-            }else if (v instanceof CustomObject) {
-                HashMap<String, Object> a = new CustomObject().convertToHashMap((CustomObject) v);
-                newArrayList.add(a);
-            } else {
-                newArrayList.add(v);
-            }
-        });
-        return newArrayList;
-    }
-
-    @Override
+    /**
+     * Converts the current Array object into String format
+     * @return String format of Array current object
+     */
     public String toString() {
-        ArrayList<Object> arr = convertToArrayList(this);
-        if(gson == null) gson = new Gson() ;
-        return gson.toJson(arr);
+        StringBuilder builder = new StringBuilder();
+        builder.append("[");
+
+        for(int i = 0; i < objectList.size(); i++){
+            Object value = objectList.get(i);
+            if(value instanceof Array || value instanceof CustomObject){
+                String valueString = value.toString();
+                builder.append(valueString);
+            } else if(value instanceof String){
+                builder.append("\""+ value + "\"");
+            }else{
+                builder.append(value);
+            }
+            if(i < this.length() - 1){
+                builder.append(",");
+            }
+        }
+        builder.append("]");
+        return builder.toString();
     }
 
     public Object clone()
@@ -159,9 +153,15 @@ public class Array implements Serializable, IArray{
         return objectList.size();
     }
 
-    public Array fromString(String str) throws JsonProcessingException {
+    /**
+     * Converts String format into Array of Objects by parsing using Jackson JSON library
+     * @param value String format of Array Objects
+     * @return Array Object by converting String to specific type of objects
+     * @throws JsonProcessingException if any difficulty parsing String
+     */
+    public Array fromString(String value) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
-        List<Object> list = mapper.readValue(str, ArrayList.class);
+        List<Object> list = mapper.readValue(value, ArrayList.class);
         Array arrayObjects = new Array();
 
         for (Object obj : list) {
@@ -178,26 +178,6 @@ public class Array implements Serializable, IArray{
         }
         return arrayObjects;
     }
-
-//    public Array fromString(String value) {
-//        Array newArray = new Array();
-//        Type expectedType = new TypeToken<ArrayList<Object>>(){}.getType();
-//        ArrayList object = gson.fromJson(value, expectedType);
-//        object.forEach((v)
-//                -> {
-//            if (v instanceof ArrayList) {
-//                Array a = this.fromString(v.toString());
-//                newArray.put(a);
-//            }else if (v instanceof Map) {
-//                CustomObject db = new CustomObject();
-//                CustomObject a = db.fromString(v.toString());
-//                newArray.put(a);
-//            } else {
-//                newArray.put(v);
-//            }
-//        });
-//        return newArray;
-//    }
 
     @Override
     public boolean equals(Object object) {

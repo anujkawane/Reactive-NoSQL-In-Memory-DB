@@ -6,13 +6,13 @@ import com.akawane0813.exception.KeyNotFoundException;
 
 import java.io.Serializable;
 
-public class DatabasePut implements IDatabaseCommands, Serializable {
+public class DatabasePutCommand implements IDatabaseCommands, Serializable {
 
     private final Object object;
     private Database db;
     private String key;
 
-    public DatabasePut(String key, Object object) {
+    public DatabasePutCommand(String key, Object object) {
         this.key = key;
         this.object = object;
     }

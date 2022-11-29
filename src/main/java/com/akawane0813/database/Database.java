@@ -39,6 +39,9 @@ public class Database implements Serializable, IDatabase {
 
     }
 
+    /**
+     * Check for snapshot after specific time
+     */
     private void backup() {
         if(System.currentTimeMillis() > END_TIME){
             snapshot();
@@ -135,20 +138,27 @@ public class Database implements Serializable, IDatabase {
     }
 
 
+    /**
+     * Saves the state of the current object after specified time interval and clears the command file.
+     */
     public void snapshot(){
 
         FileOperations fileOperation = new FileOperations();
         fileOperation.writeObjectToFile(new File(DATABASE_MEMENTO_FILEPATH), database);
 
-//        clears the commands from file after backup
         FileOperations.clearFile(new File(COMMANDS_FILEPATH));
     }
 
+    /**
+     * Saves the state of the current object after specified time interval and clears the command file.
+     *
+     * @param commands Commands file to clear after saving state
+     * @param dbSnapshot DBSnapshot file to save the state
+     */
     public void snapshot(File commands, File dbSnapshot){
         FileOperations fileOperation = new FileOperations();
         fileOperation.writeObjectToFile(dbSnapshot, database);
 
-//        clears the commands from file after backup
         FileOperations.clearFile(commands);
     }
 
@@ -156,8 +166,6 @@ public class Database implements Serializable, IDatabase {
         Cursor cursor = null;
         try {
             cursor = new Cursor(key, this);
-        } catch (CloneNotSupportedException e) {
-            throw new RuntimeException(e);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -169,6 +177,10 @@ public class Database implements Serializable, IDatabase {
     }
 
 
+    /**
+     * Recovers previously saved state of the object by loading the snapshot
+     * and then execute the saved commands on restored DB object
+     */
     public void recover(){
         FileOperations fileOperation = new FileOperations();
         DataStore restoredDB =
@@ -183,10 +195,12 @@ public class Database implements Serializable, IDatabase {
         }
     }
 
-    public void clear(){
-        FileOperations.clearFile(new File(DATABASE_MEMENTO_FILEPATH));
-    }
-
+    /**
+     * Recovers previously saved state of the object by loading the snapshot
+     * and then execute the saved commands on restored DB object
+     * @param commands Commands file to execute saved commands
+     * @param dbSnapshot DBSnapshot file to recover state
+     */
     public void recover(File commands, File dbSnapshot){
         FileOperations fileOperation = new FileOperations();
         DataStore restoredDB =
@@ -201,7 +215,7 @@ public class Database implements Serializable, IDatabase {
         }
     }
 
-    public boolean contains(String key) {
+    public boolean containsKey(String key) {
         return database.containsKey(key);
     }
 }

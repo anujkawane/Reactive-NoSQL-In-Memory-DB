@@ -7,6 +7,4 @@ public interface IDatabaseCommands {
     Object execute (Object object) throws KeyNotFoundException;
 
     Object undo() throws KeyNotFoundException;
-
-
 }

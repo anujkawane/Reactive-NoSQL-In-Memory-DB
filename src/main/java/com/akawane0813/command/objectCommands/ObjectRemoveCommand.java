@@ -6,18 +6,19 @@ import com.akawane0813.exception.KeyNotFoundException;
 
 import java.io.Serializable;
 
-public class ObjectRemove implements IDatabaseCommands, Serializable {
+public class ObjectRemoveCommand implements IDatabaseCommands, Serializable {
     private CustomObject customObject;
     private String key;
     private Object removedValue;
 
-    public ObjectRemove(String key) {
+    public ObjectRemoveCommand(String key) {
         this.key = key;
     }
 
     public Object execute(Object object) throws KeyNotFoundException {
         customObject = (CustomObject) object;
-        return customObject.remove(key);
+        removedValue = customObject.remove(key);
+        return removedValue;
     }
 
     public Object undo() throws KeyNotFoundException {

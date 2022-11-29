@@ -1,8 +1,8 @@
 package com.akawane0813.decorator;
 
 import com.akawane0813.command.IDatabaseCommands;
-import com.akawane0813.command.arrayCommands.ArrayPut;
-import com.akawane0813.command.arrayCommands.ArrayRemove;
+import com.akawane0813.command.arrayCommands.ArrayPutCommand;
+import com.akawane0813.command.arrayCommands.ArrayRemoveCommand;
 import com.akawane0813.database.*;
 import com.akawane0813.exception.IncompatibleTypeException;
 import com.akawane0813.exception.KeyNotFoundException;
@@ -21,7 +21,7 @@ public class ArrayExecutor implements IArray {
     }
 
     public boolean put(Object value) throws KeyNotFoundException {
-        IDatabaseCommands put = new ArrayPut(value);
+        IDatabaseCommands put = new ArrayPutCommand(value);
 
         Boolean response = (boolean)put.execute(this.array);
 
@@ -42,7 +42,6 @@ public class ArrayExecutor implements IArray {
         return this.array.getInt(index);
     }
 
-    @Override
     public Double getDouble(int index) throws IncompatibleTypeException {
         return this.array.getDouble(index);
     }
@@ -63,8 +62,14 @@ public class ArrayExecutor implements IArray {
         return this.array.toString();
     }
 
+    /**
+     * Removes object at specified index in array and returns it
+     * @param index index of array
+     * @return removed object
+     * @throws Exception if index is out of bound
+     */
     public Object remove(int index) throws Exception {
-        IDatabaseCommands remove = new ArrayRemove(index);
+        IDatabaseCommands remove = new ArrayRemoveCommand(index);
 
         Object value = remove.execute(this.array);
 

@@ -5,12 +5,12 @@ import com.akawane0813.database.Array;
 
 import java.io.Serializable;
 
-public class ArrayPut implements IDatabaseCommands, Serializable {
+public class ArrayPutCommand implements IDatabaseCommands, Serializable {
     private Object value;
     private Array array;
     private int index;
 
-    public ArrayPut(Object value) {
+    public ArrayPutCommand(Object value) {
         this.value = value;
     }
 

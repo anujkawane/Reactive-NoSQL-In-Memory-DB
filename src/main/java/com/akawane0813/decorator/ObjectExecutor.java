@@ -1,8 +1,8 @@
 package com.akawane0813.decorator;
 
 import com.akawane0813.command.IDatabaseCommands;
-import com.akawane0813.command.objectCommands.ObjectPut;
-import com.akawane0813.command.objectCommands.ObjectRemove;
+import com.akawane0813.command.objectCommands.ObjectPutCommand;
+import com.akawane0813.command.objectCommands.ObjectRemoveCommand;
 import com.akawane0813.database.*;
 import com.akawane0813.exception.IncompatibleTypeException;
 import com.akawane0813.exception.KeyNotFoundException;
@@ -23,7 +23,7 @@ public class ObjectExecutor implements ICustomObject {
     }
 
     public boolean put(String key, Object value) throws KeyNotFoundException {
-        IDatabaseCommands put = new ObjectPut(key,value);
+        IDatabaseCommands put = new ObjectPutCommand(key,value);
 
         Boolean res = (boolean)put.execute(this.customObject);
 
@@ -45,12 +45,20 @@ public class ObjectExecutor implements ICustomObject {
         return this.customObject.get(key);
     }
 
+    public String getString(String key) throws Exception {
+        return customObject.getString(key);
+    }
+
     public int getInt(String key) throws IncompatibleTypeException {
-        return this.customObject.getInt(key);
+        return customObject.getInt(key);
+    }
+
+    public Double getDouble(String key) throws Exception {
+        return customObject.getDouble(key);
     }
 
     public String toString(){
-        return this.customObject.toString();
+        return customObject.toString();
     }
 
     public IArray getArray(String key) throws IncompatibleTypeException {
@@ -61,17 +69,19 @@ public class ObjectExecutor implements ICustomObject {
         return new ObjectExecutor(this.customObject.getObject(key));
     }
 
-    public Object remove(String key) throws KeyNotFoundException {
-        IDatabaseCommands remove = new ObjectRemove(key);
+    /**
+     * Removes object at given key
+     * @param key to remove object
+     * @return removed object
+     * @throws KeyNotFoundException if key is not present
+     */
+    public Object remove(String key) throws Exception {
+        IDatabaseCommands remove = new ObjectRemoveCommand(key);
 
         Object value = remove.execute(this.customObject);
+        executor.writeToFile("PUT" + "->" + customObject.getParent() + "->" +
+                database.get(customObject.getParent()).toString());
 
-        try {
-            executor.writeToFile("PUT" + "->" + customObject.getParent() + "->" + database.get(customObject.getParent()).toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         return value;
     }
-
 }

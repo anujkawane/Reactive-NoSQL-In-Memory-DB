@@ -1,8 +1,8 @@
 package com.akawane0813.decorator;
 
 import com.akawane0813.command.IDatabaseCommands;
-import com.akawane0813.command.databaseCommands.DatabasePut;
-import com.akawane0813.command.databaseCommands.DatabaseRemove;
+import com.akawane0813.command.databaseCommands.DatabasePutCommand;
+import com.akawane0813.command.databaseCommands.DatabaseRemoveCommand;
 import com.akawane0813.cursor.Cursor;
 import com.akawane0813.database.*;
 import com.akawane0813.exception.KeyNotFoundException;
@@ -15,7 +15,6 @@ import java.util.Stack;
 
 public class DatabaseExecutor implements IDatabase {
 
-    private final String DATABASE_MEMENTO_FILEPATH = "src/main/resources/dbSnapshot.txt";
     private final String COMMANDS_FILEPATH = "src/main/resources/commands.txt";
 
     private Database database;
@@ -59,7 +58,7 @@ public class DatabaseExecutor implements IDatabase {
         String key = commands.get(1);
         String value = commands.get(2);
 
-        if (database.contains(key)) {
+        if (database.containsKey(key)) {
             database.remove(key);
             put(key,parseValue(value));
         } else {
@@ -67,6 +66,13 @@ public class DatabaseExecutor implements IDatabase {
         }
     }
 
+
+    /**
+     * Parse value to specific type of object bases on string format
+     * @param value String value which needs to be parse
+     * @return specific type of object
+     * @throws JsonProcessingException if any in conversion of fromString
+     */
     public Object parseValue(String value) throws JsonProcessingException {
 
         if (value.charAt(0) == '[') {
@@ -86,8 +92,15 @@ public class DatabaseExecutor implements IDatabase {
         return this.database.toString();
     }
 
+    /**
+     * Execute put command and saves String format of command in file
+     * @param key in database where value will be stored
+     * @param value to store in DB against given key
+     * @return true if success, false otherwise
+     * @throws Exception if any
+     */
     public boolean put(String key, Object value) throws Exception {
-        IDatabaseCommands put = new DatabasePut(key,value);
+        IDatabaseCommands put = new DatabasePutCommand(key,value);
 
         put.execute(this.database);
 
@@ -103,6 +116,11 @@ public class DatabaseExecutor implements IDatabase {
         return true;
     }
 
+    /**
+     * Inserts key at every child object to handle the nested values in objects
+     * @param key in database where value will be stored
+     * @param value to store in DB against given key
+     */
     public void insertSuperKeyInEveryChild(String key,Object value) {
         if(value instanceof Array) {
             ((Array)value).setParent(key);
@@ -137,8 +155,14 @@ public class DatabaseExecutor implements IDatabase {
         return new ObjectExecutor(database.getObject(key));
     }
 
+    /**
+     * Execute remove command and saves String format of command in file
+     * @param key in database to be deleted
+     * @return removed object
+     * @throws Exception if given key is not present
+     */
     public Object remove(String key) throws KeyNotFoundException {
-        IDatabaseCommands remove = new DatabaseRemove(key);
+        IDatabaseCommands remove = new DatabaseRemoveCommand(key);
 
         Object value = remove.execute(this.database);
         String commandString = "PUT->" + key +  "->" + "NO-VALUE";

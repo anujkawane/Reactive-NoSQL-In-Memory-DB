@@ -14,31 +14,35 @@ import java.util.List;
 
 public class Cursor {
     private String key;
-    private Database db;
+    private Database database;
     private Object currentValue;
 
     public List<IObserver> observers = new ArrayList<>();
 
     private CursorTracker cursorTracker = CursorTracker.getInstance();
-    public Cursor(String key, Database db) throws Exception {
+    public Cursor(String key, Database database) throws Exception {
 
-        this.db = db;
+        this.database = database;
         this.key = key;
-        this.currentValue = this.db.get(key);
+        this.currentValue = this.database.get(key);
 
         if (this.currentValue instanceof Array) {
-            this.currentValue = ((Array)this.db.get(key)).clone();
+            this.currentValue = ((Array)this.database.get(key)).clone();
         } else if(this.currentValue instanceof CustomObject) {
-            this.currentValue = ((CustomObject)this.db.get(key)).clone();
+            this.currentValue = ((CustomObject)this.database.get(key)).clone();
         }
 
         cursorTracker.put(key,this);
     }
-    
+
+    /**
+     * updates
+     * @return
+     */
     public boolean updateObserver() {
         String message = "";
         try {
-            Object newValue = this.db.get(key);
+            Object newValue = this.database.get(key);
             message =  key + " in the DB updated with "+newValue.toString();
 
         } catch(KeyNotFoundException e) {
@@ -49,10 +53,15 @@ public class Cursor {
 
 
         String finalMessage = message;
-        observers.forEach((o)->o.update(finalMessage));
+        observers.forEach((object)->object.update(finalMessage));
         return true;
     }
 
+    /**
+     * Adds observer to the list
+     * @param observer to be added in list
+     * @return true if added
+     */
     public boolean addObserver(IObserver observer) {
         observers.add(observer);
         return true;
@@ -69,28 +78,35 @@ public class Cursor {
 
     public Integer getInt() throws IncompatibleTypeException {
         if(!(this.currentValue instanceof Integer)) {
-            throw new IncompatibleTypeException("The current value is not an integer");
+            throw new IncompatibleTypeException("Object is not of type integer");
         }
         return (Integer) this.currentValue;
     }
 
+    public Double getDouble() throws IncompatibleTypeException {
+        if(!(this.currentValue instanceof Double)) {
+            throw new IncompatibleTypeException("Object is not of type Double");
+        }
+        return (Double) this.currentValue;
+    }
+
     public String getString() throws IncompatibleTypeException {
         if(!(this.currentValue instanceof String)) {
-            throw new IncompatibleTypeException("The current value is not a string");
+            throw new IncompatibleTypeException("Object is not of type string");
         }
         return (String) this.currentValue;
     }
 
     public Array getArray() throws IncompatibleTypeException {
         if(!(this.currentValue instanceof Array)) {
-            throw new IncompatibleTypeException("The current value is not an Array");
+            throw new IncompatibleTypeException("Object is not of type Array");
         }
         return (Array) this.currentValue;
     }
 
     public CustomObject getObject() throws IncompatibleTypeException {
         if(!(this.currentValue instanceof CustomObject)) {
-            throw new IncompatibleTypeException("The current value is not a custom object");
+            throw new IncompatibleTypeException("Object is not of type CustomObject");
         }
         return (CustomObject) this.currentValue;
     }

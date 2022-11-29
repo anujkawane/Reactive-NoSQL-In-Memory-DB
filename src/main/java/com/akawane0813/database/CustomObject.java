@@ -4,22 +4,18 @@ import com.akawane0813.exception.KeyNotFoundException;
 import com.akawane0813.exception.IncompatibleTypeException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import java.io.Serializable;
-import java.lang.reflect.Type;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class CustomObject implements Serializable, ICustomObject {
 
-    Map map;
-    transient Gson gson;
+    Map<String, Object> map;
     private String parent;
 
     public CustomObject(){
         map = new HashMap();
-        gson = new Gson();
     }
 
     public boolean put(String key, Object object) throws KeyNotFoundException {
@@ -51,37 +47,41 @@ public class CustomObject implements Serializable, ICustomObject {
             return (String) map.get(key);
         }
 
-        throw new IncompatibleTypeException("CustomObject at "+key+" is not of type String");
+        throw new IncompatibleTypeException("Object at "+key+" is not of type String");
     }
 
     public int getInt(String key) throws IncompatibleTypeException {
         if(map.get(key) instanceof Integer){
             return (int) map.get(key);
         }
-        throw new IncompatibleTypeException("CustomObject at key "+key+" is not of type Integer");
+        throw new IncompatibleTypeException("Object at key "+key+" is not of type Integer");
     }
 
     public Double getDouble(String key) throws IncompatibleTypeException {
         if(map.get(key) instanceof Double){
             return (Double) map.get(key);
         }
-        throw new IncompatibleTypeException("CustomObject at key "+key+" is not of type Double");
+        throw new IncompatibleTypeException("Object at key "+key+" is not of type Double");
     }
 
     public CustomObject getObject(String key) throws IncompatibleTypeException {
         if(map.get(key) instanceof CustomObject){
             return (CustomObject) map.get(key);
         }
-        throw new IncompatibleTypeException("CustomObject at key "+key+" is not of type CustomObject");
+        throw new IncompatibleTypeException("Object at key "+key+" is not of type CustomObject");
     }
 
     public Array getArray(String key) throws IncompatibleTypeException {
         if(map.get(key) instanceof Array){
             return (Array) map.get(key);
         }
-        throw new IncompatibleTypeException("CustomObject at key "+key+" is not of type Array");
+        throw new IncompatibleTypeException("Object at key "+key+" is not of type Array");
     }
 
+    /**
+     * Returns parent key of the current object to handle nested values
+     * @return
+     */
     public String getParent() {
         return parent;
     }
@@ -93,12 +93,11 @@ public class CustomObject implements Serializable, ICustomObject {
         return map.get(key);
     }
 
-    public int length(){
-        return map.size();
-    }
-
+    /**
+     * Sets parent key of the current value to handle the nested values
+     * @param parent key in the DB
+     */
     public void setParent(String parent) {
-        int index = 0;
         this.parent = parent;
         map.forEach((k,v)->{
             if(v instanceof Array) {
@@ -110,36 +109,16 @@ public class CustomObject implements Serializable, ICustomObject {
         });
     }
 
-    public HashMap<String,Object> convertToHashMap(CustomObject object) {
-        HashMap<String,Object> map = new HashMap<>();
-
-        object.map.forEach((k,v) -> {
-            if (v instanceof Array) {
-                Array arr = new Array();
-                ArrayList<Object> a = arr.convertToArrayList((Array)v);
-                map.put((String) k,a);
-            }else if (v instanceof CustomObject) {
-                HashMap<String, Object> a = convertToHashMap((CustomObject) v);
-                map.put((String) k,a);
-            } else {
-                map.put((String) k,v);
-            }
-        });
-        return map;
-    }
-
-
-    public String toString(){
-        HashMap<String, Object> map = convertToHashMap(this);
-        if(gson == null) gson = new Gson();
-        return gson.toJson(map);
-    }
-
-    public Object clone() throws CloneNotSupportedException
-    {
+    public Object clone() {
         return fromString(toString());
     }
 
+    /**
+     * Converts String format into CustomObject of Objects by parsing using Jackson JSON library
+     * @param stringValue String format of Custom Objects
+     * @return CustomObject by converting String to specific type of objects
+     * @throws JsonProcessingException if any difficulty parsing String
+     */
     public CustomObject fromString(String stringValue) {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> parsedJson;
@@ -155,8 +134,7 @@ public class CustomObject implements Serializable, ICustomObject {
             Object value = entry.getValue();
             try {
                 if (value instanceof ArrayList) {
-                    String json = null;
-                    json = mapper.writeValueAsString(value);
+                    String json = mapper.writeValueAsString(value);
                     newCustomObject.put(key, new Array().fromString(json));
                 } else if (value instanceof Map) {
                     String json = mapper.writeValueAsString(value);
@@ -171,45 +149,45 @@ public class CustomObject implements Serializable, ICustomObject {
 
         return newCustomObject;
     }
-//    public CustomObject fromString(String value) {
-//        Type userListType = new TypeToken<HashMap<String,Object>>(){}.getType();
-//        HashMap object = gson.fromJson(value, userListType);
-//        CustomObject newCustomObject = new CustomObject();
-//        this.map = object;
-//
-//        object.forEach((k, v)
-//                -> {
-//            if (v instanceof ArrayList) {
-//                Array array = new Array().fromString(v.toString());
-//                try {
-//                    newCustomObject.put(k.toString(),array);
-//                } catch (KeyNotFoundException e) {
-//                    e.printStackTrace();
-//                }
-//            }else if (v instanceof Map) {
-//                CustomObject customObject = fromString(v.toString());
-//                try {
-//                    newCustomObject.put(k.toString(),customObject);
-//                } catch (KeyNotFoundException e) {
-//                    e.printStackTrace();
-//                }
-//            } else {
-//                try {
-//                    newCustomObject.put(k.toString(),v);
-//                } catch (KeyNotFoundException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-//        return newCustomObject;
-//    }
+
+    /**
+     * Converts the current Custom object into String format so that it can be parsable using fromString
+     * @return String format of CustomObjets current object
+     */
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        final AtomicInteger indexInteger = new AtomicInteger();
+        builder.append("{");
+        int index = 0;
+        for (Map.Entry<String, Object> entry : map.entrySet()){
+        String key = entry.getKey();
+        Object value = entry.getValue();
+            builder.append("\"" +key + "\":");
+            if(value instanceof Array || value instanceof CustomObject){
+                String valueString = value.toString();
+                builder.append(valueString);
+            }else if(value instanceof String){
+                builder.append("\""+ value + "\"");
+            }else{
+                builder.append(value);
+            }
+
+            if(index < map.size() - 1)
+                builder.append(",");
+            index++;
+        }
+
+        builder.append("}");
+        return builder.toString();
+
+    }
 
     public int size(){
         return map.size();
     }
 
-    public List<String> keys() {
-        return new ArrayList<>(map.keySet());
+    public Set<String> keySet() {
+        return new HashSet<>(map.keySet());
     }
 
     @Override

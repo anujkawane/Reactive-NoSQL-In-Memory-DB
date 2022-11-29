@@ -72,11 +72,13 @@ public class Transaction implements IDatabase {
         return true;
     }
 
+    /**
+     * Commit commands and make the transaction inActive
+     * @return true if commands commited
+     */
     public boolean commit() {
         databaseExecutor.commitCommands();
         isActive = false;
         return true;
     }
-
-
 }
