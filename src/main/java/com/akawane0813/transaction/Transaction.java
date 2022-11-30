@@ -35,6 +35,10 @@ public class Transaction implements IDatabase {
         return database.getInt(key);
     }
 
+    public boolean isActive() {
+        return isActive;
+    }
+
     public Double getDouble(String key) throws Exception {
         return database.getDouble(key);
     }

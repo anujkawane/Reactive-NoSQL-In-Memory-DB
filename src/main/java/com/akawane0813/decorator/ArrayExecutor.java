@@ -22,7 +22,6 @@ public class ArrayExecutor implements IArray {
 
     public boolean put(Object value) throws KeyNotFoundException {
         IDatabaseCommands put = new ArrayPutCommand(value);
-
         Boolean response = (boolean)put.execute(this.array);
 
         try {
@@ -70,10 +69,11 @@ public class ArrayExecutor implements IArray {
      */
     public Object remove(int index) throws Exception {
         IDatabaseCommands remove = new ArrayRemoveCommand(index);
-
         Object value = remove.execute(this.array);
 
+
         executor.writeToFile(  "PUT->" + array.getParent() + "->" + database.get(array.getParent()).toString());
+
         return value;
     }
 }

@@ -1,9 +1,10 @@
 package com.akawane0813.observer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Observer implements IObserver{
-    private List<String> logs;
+    private List<String> logs= new ArrayList<>();
     public Observer() {
 
     }

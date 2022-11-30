@@ -2,6 +2,9 @@ package com.akawane0813.cursor;
 
 import java.util.HashMap;
 
+/**
+ * Singleton class to keep track of cursors
+ */
 public class CursorTracker {
     private static CursorTracker cursorTracker;
 

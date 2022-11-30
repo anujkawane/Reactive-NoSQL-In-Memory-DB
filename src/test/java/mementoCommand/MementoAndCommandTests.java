@@ -20,9 +20,9 @@ public class MementoAndCommandTests {
     DatabaseExecutor databaseExecutor;
     private final String DATABASE_MEMENTO_FILEPATH = "src/main/resources/dbSnapshot.txt";
     private final String COMMANDS_FILEPATH = "src/main/resources/commands.txt";
-    private final int BACKUP_INTERVAL_SECONDS = 5;
-    @BeforeEach
+    private final int BACKUP_INTERVAL_SECONDS = 6;
 
+    @BeforeEach
     public void setUp() {
         databaseExecutor = new DatabaseExecutor(new Database());
         fileOperations = new FileOperations();
@@ -83,7 +83,8 @@ public class MementoAndCommandTests {
 
         i = 1;
         for(Object o : testData){
-            Assert.assertEquals(o, restoredDB.get("Key"+i));
+            Object o1 = restoredDB.get("Key" + i);
+            Assert.assertEquals(o, o1);
             i++;
         }
     }
@@ -106,6 +107,4 @@ public class MementoAndCommandTests {
 
         return testData;
     }
-
-
 }

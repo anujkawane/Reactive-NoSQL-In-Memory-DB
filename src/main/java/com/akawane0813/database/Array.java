@@ -1,5 +1,7 @@
 package com.akawane0813.database;
 
+import com.akawane0813.cursor.Cursor;
+import com.akawane0813.cursor.CursorTracker;
 import com.akawane0813.exception.IncompatibleTypeException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,6 +13,9 @@ public class Array implements Serializable, IArray{
     List objectList;
 
     private String parent = "";
+
+    private final CursorTracker cursorTracker = CursorTracker.getInstance();
+
 
     public Array(){
         objectList = new ArrayList();
@@ -33,6 +38,10 @@ public class Array implements Serializable, IArray{
             ((Array)object).setParent(parent);
         } else if (object instanceof CustomObject) {
             ((CustomObject)object).setParent(parent);
+        }
+        Cursor cursor = cursorTracker.getCursor(getParent());
+        if(cursor != null ) {
+            cursor.updateObserver();
         }
         objectList.add(object);
         return true;
@@ -109,6 +118,10 @@ public class Array implements Serializable, IArray{
     public Object remove(int index) {
         if(index < objectList.size()) {
             return objectList.remove(index);
+        }
+        Cursor cursor = cursorTracker.getCursor(getParent());
+        if(cursor != null ) {
+            cursor.updateObserver();
         }
         throw new IndexOutOfBoundsException();
     }

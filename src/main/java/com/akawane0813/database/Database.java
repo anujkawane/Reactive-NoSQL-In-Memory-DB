@@ -11,6 +11,10 @@ import com.akawane0813.transaction.Transaction;
 import java.io.File;
 import java.io.Serializable;
 
+/**
+ * Reactive NoSQL - > Implementation if In-memory Database with OOP design pattern.
+ * @author Anuj Kawane <akawane0813@sdsu.edu> <825890176>
+ */
 public class Database implements Serializable, IDatabase {
 
     private DataStore database;
@@ -32,11 +36,15 @@ public class Database implements Serializable, IDatabase {
         initializeDatabase();
     }
 
+    public Database(File commandFile, File mementoFile) {
+        database = new DataStore();
+        recover(commandFile, mementoFile);
+    }
+
     //load BookList from memento if available
     private void initializeDatabase() {
         database = new DataStore();
         recover();
-
     }
 
     /**
@@ -145,7 +153,6 @@ public class Database implements Serializable, IDatabase {
 
         FileOperations fileOperation = new FileOperations();
         fileOperation.writeObjectToFile(new File(DATABASE_MEMENTO_FILEPATH), database);
-
         FileOperations.clearFile(new File(COMMANDS_FILEPATH));
     }
 
@@ -188,6 +195,7 @@ public class Database implements Serializable, IDatabase {
         if(restoredDB != null) {
             database = restoredDB;
         }
+
         try {
             new DatabaseExecutor(this).executeSavedCommands(new File(COMMANDS_FILEPATH));
         } catch (Exception e) {

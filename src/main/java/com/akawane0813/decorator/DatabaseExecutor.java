@@ -34,12 +34,16 @@ public class DatabaseExecutor implements IDatabase {
         executor = Executor.getInstance(db,commandFile);
         this.database = db;
         this.commandFile = commandFile;
+        executor = Executor.getInstance(db,new File(COMMANDS_FILEPATH));
+
     }
 
     public DatabaseExecutor(Database db, Stack<IDatabaseCommands> operations) {
         this.database = db;
         this.stack = operations;
         commandStrings = new Stack<>();
+        executor = Executor.getInstance(db,new File(COMMANDS_FILEPATH));
+
     }
 
     public void executeSavedCommands(File commandFile) throws Exception {
@@ -112,6 +116,7 @@ public class DatabaseExecutor implements IDatabase {
             commandStrings.add(commandString);
         }
 
+
         return true;
     }
 
@@ -162,8 +167,8 @@ public class DatabaseExecutor implements IDatabase {
     public Object remove(String key) throws KeyNotFoundException {
         IDatabaseCommands remove = new DatabaseRemoveCommand(key);
 
-        Object value = remove.execute(this.database);
         String commandString = "PUT->" + key +  "->" + "NO-VALUE";
+        Object value = remove.execute(this.database);
 
         if (stack == null) {
             executor.writeToFile(commandString);
@@ -172,6 +177,7 @@ public class DatabaseExecutor implements IDatabase {
             commandStrings.add(commandString);
 
         }
+
         return value;
     }
 

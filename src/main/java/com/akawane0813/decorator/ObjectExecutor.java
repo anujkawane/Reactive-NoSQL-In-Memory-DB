@@ -23,8 +23,8 @@ public class ObjectExecutor implements ICustomObject {
 
     public boolean put(String key, Object value) throws KeyNotFoundException {
         IDatabaseCommands put = new ObjectPutCommand(key,value);
-
         boolean res = (boolean)put.execute(this.customObject);
+
 
         Object newValue;
         try {
@@ -76,8 +76,9 @@ public class ObjectExecutor implements ICustomObject {
      */
     public Object remove(String key) throws Exception {
         IDatabaseCommands remove = new ObjectRemoveCommand(key);
-
         Object value = remove.execute(this.customObject);
+
+
         executor.writeToFile("PUT" + "->" + customObject.getParent() + "->" +
                 database.get(customObject.getParent()).toString());
 

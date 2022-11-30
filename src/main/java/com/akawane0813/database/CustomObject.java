@@ -1,5 +1,7 @@
 package com.akawane0813.database;
 
+import com.akawane0813.cursor.Cursor;
+import com.akawane0813.cursor.CursorTracker;
 import com.akawane0813.exception.KeyNotFoundException;
 import com.akawane0813.exception.IncompatibleTypeException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -13,6 +15,9 @@ public class CustomObject implements Serializable, ICustomObject {
 
     Map<String, Object> map;
     private String parent;
+
+    private final CursorTracker cursorTracker = CursorTracker.getInstance();
+
 
     public CustomObject(){
         map = new HashMap();
@@ -30,6 +35,11 @@ public class CustomObject implements Serializable, ICustomObject {
             ((CustomObject)object).setParent(parent);
         }
 
+        Cursor cursor = cursorTracker.getCursor(getParent());
+        if(cursor != null ) {
+            cursor.updateObserver();
+        }
+
         map.put(key,object);
         return true;
     }
@@ -38,6 +48,10 @@ public class CustomObject implements Serializable, ICustomObject {
     public Object remove(String key) throws KeyNotFoundException {
         if(map.containsKey(key)){
             return map.remove(key);
+        }
+        Cursor cursor = cursorTracker.getCursor(getParent());
+        if(cursor != null ) {
+            cursor.updateObserver();
         }
         throw new KeyNotFoundException("No data present in given key "+key);
     }

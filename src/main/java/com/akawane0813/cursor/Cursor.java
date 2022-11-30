@@ -12,6 +12,9 @@ import com.akawane0813.observer.Observer;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Anuj Kawane <akawane0813@sdsu.edu> <825890176>
+ */
 public class Cursor {
     private String key;
     private Database database;
@@ -36,8 +39,8 @@ public class Cursor {
     }
 
     /**
-     * updates
-     * @return
+     * updates all observers in the list with the change
+     * @return true
      */
     public boolean updateObserver() {
         String message = "";

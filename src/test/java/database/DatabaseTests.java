@@ -45,14 +45,14 @@ public class DatabaseTests {
     @Test
     public void testPutFromStringArray() throws Exception {
         String value = "";
-        databaseExecutor.put("Key", new Array().fromString("[\"Anuj\", 2.0, {\"name\": \"Roger\", \"age\": 21.0}]"));
+        databaseExecutor.put("Key", new Array().fromString("[\"Anuj\", 2.0, {\"name\": \"Anuj\", \"Number\": 21.0}]"));
         Array array = new Array();
         array.put("Anuj");
         array.put(2.0);
 
         CustomObject customObject = new CustomObject();
-        customObject.put("name","Roger");
-        customObject.put("age",21.0);
+        customObject.put("name","Anuj");
+        customObject.put("Number",21.0);
         array.put(customObject);
 
         Assert.assertEquals(array, databaseExecutor.get("Key"));
