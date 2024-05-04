@@ -1,4 +1,4 @@
-# Reactive NoSQL Database
+# Reactive NoSQL In-Memory Database
 
 This repository contains an implementation of a mini-in-memory NoSQL database with reactive features. The database supports storing unstructured data using key-value pairs, similar to a hashtable.
 
